@@ -1,4 +1,7 @@
-Feature:
+Feature: Hard kill a runaway workflow job
+
+    A user should be able to kill a running job, and that should also
+    terminate the associated instance.
 
     Scenario: Manual kill
         Given a long-running workflow
