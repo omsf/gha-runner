@@ -10,3 +10,11 @@ Feature: Track physical cost of running
         # TODO: having trouble with this one because I feel like it depends
         # on the specific mechanism
 
+    # WIP: I think this is the generic form of this information
+    # the mechanism for tracking the cost is not specified here.
+    Scenario: When I run a test, I can see how much it costs
+        Given I have a test that runs for X amount of time
+        And I have a cost of Y per unit time
+        And I have a mechanism for tracking the cost
+        When I run the test
+        Then I receive a caclulated cost of running the test.
