@@ -11,3 +11,8 @@ Feature: Quickstart guide
         And I have not previously set up AWS infra for this tool
         When I use the quickstart command
         Then I should have a working workflow
+
+    Scenario: Up-to date documentation
+        Given I have the latest version of the tool
+        When I look at the documentation
+        Then I should see up-to-date and tested information
