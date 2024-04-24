@@ -33,7 +33,19 @@ Feature: Select platform to run on
         # responsibility of the workflow writer
 
     # NOTE: This is not an MVP requirement
-    Scenario: Running with ROCm stack
-        Given a workflow that requires an ROCm stack
+    Scenario: Running with ROCM stack
+        Given a workflow that requires an ROCM stack
         When I run the workflow
-        Then it should run on hardware with the appropriate ROCm stack 
+        Then it should run on hardware with the appropriate ROCM stack 
+    
+    Scenario: Running with an inference stack with various hardware
+        Given a workflow that requires an inference stack
+        When I run the workflow
+        Then it should run on hardware with the appropriate inference stack
+        And my software should be able to interact with the inference stack
+
+    Scenario: Running a small ML training run
+        Given a workflow that requires an inference stack
+        And the workflow is a small ML training run
+        When I run the workflow
+        Then it should run on hardware with the appropriate inference stack
