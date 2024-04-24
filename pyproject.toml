@@ -1,17 +1,19 @@
 [project]
 name = "gha-runner"
-version = "0.1.0"
+version = "0.0.1.dev0"
 description = "A GitHub Runner for deploying on cloud backends"
 authors = [
     { name = "Ethan Holz", email = "ethan.holz@omsf.io" }
 ]
+readme = "README.md"
+requires-python = ">= 3.10"
 dependencies = [
     "boto3",
 ]
-readme = "README.md"
-requires-python = ">= 3.8"
 
 [build-system]
-requires = ["setuptools >= 61.2", "versioningit"]
+# We are not going to add versioningit at this time
+requires = ["setuptools >= 61.2"]
 build-backend = "setuptools.build_meta"
+
 
