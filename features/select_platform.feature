@@ -32,4 +32,8 @@ Feature: Select platform to run on
         # NOTE: anything about recovering from preemption is the
         # responsibility of the workflow writer
 
-    #Scenario: Running with ROCM stack
+    # NOTE: This is not an MVP requirement
+    Scenario: Running with ROCm stack
+        Given a workflow that requires an ROCm stack
+        When I run the workflow
+        Then it should run on hardware with the appropriate ROCm stack 
