@@ -1,0 +1,17 @@
+[project]
+name = "gha-runner"
+version = "0.1.0"
+description = "A GitHub Runner for deploying on cloud backends"
+authors = [
+    { name = "Ethan Holz", email = "ethan.holz@omsf.io" }
+]
+dependencies = [
+    "boto3",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["setuptools >= 61.2", "versioningit"]
+build-backend = "setuptools.build_meta"
+
