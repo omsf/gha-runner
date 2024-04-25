@@ -29,8 +29,20 @@ Feature: Select platform to run on
         Given a workflow that can run on preemptible hosts
         When I run the workflow
         Then it should run on a preemptible host
-        # NOTE: anything about recovering from preemption is the
+        # NOTE: anything about continuing from preemption is the
         # responsibility of the workflow writer
+
+    Scenario: A run on a preemptible instance is preempted
+        Given a workflow that can run on preemptible hosts
+        And the workflow is running
+        When the workflow is preempted
+        Then the workflow should be retried (up to a specified retry limit)
+
+    Scenario: True failures should not be retried on preemtible instances
+        Given a workflow that can run on preemptible hosts
+        And the workflow is running
+        When the workflow fails
+        Then the workflow should not be retried
 
     # NOTE: This is not an MVP requirement
     #Scenario: Running with ROCM stack
