@@ -12,6 +12,14 @@ class CloudDeployment(ABC):
     def remove_instances(self, ids: list[str]):
         pass
 
+    @abstractmethod
+    def wait_until_ready(self, ids: list[str]):
+        pass
+
+    @abstractmethod
+    def wait_until_removed(self, ids: list[str]):
+        pass
+
 
 @dataclass
 class AWS(CloudDeployment):
@@ -33,10 +41,10 @@ class AWS(CloudDeployment):
             "SubnetId": self.subnet_id,
             "SecurityGroupIds": [self.security_group_id],
             "IamInstanceProfile": {"Name": self.iam_role},
+            # TODO: This is allagedly a dictionary
             # "TagSpecifications": self.tags,
         }
         result = ec2.run_instances(**params)
-        # TODO: This might now be exactly how the result is structured
         instances = result["Instances"]
         ids = [instance["InstanceId"] for instance in instances]
         return ids
@@ -47,6 +55,16 @@ class AWS(CloudDeployment):
             "InstanceIds": ids,
         }
         ec2.terminate_instances(**params)
+
+    def wait_until_ready(self, ids: list[str]):
+        ec2 = boto3.client("ec2", self.region_name)
+        waiter = ec2.get_waiter("instance_running")
+        waiter.wait(InstanceIds=ids)
+
+    def wait_until_removed(self, ids: list[str]):
+        ec2 = boto3.client("ec2", self.region_name)
+        waiter = ec2.get_waiter("instance_terminated")
+        waiter.wait(InstanceIds=ids)
 
 
 class CloudDeploymentFactory:
