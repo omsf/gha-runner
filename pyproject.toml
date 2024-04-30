@@ -1,19 +1,19 @@
 [project]
-name = "gha-runner"
+name = "gha_runner"
 version = "0.0.1.dev0"
 description = "A GitHub Runner for deploying on cloud backends"
-authors = [
-    { name = "Ethan Holz", email = "ethan.holz@omsf.io" }
-]
+authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }]
 readme = "README.md"
 requires-python = ">= 3.10"
-dependencies = [
-    "boto3",
-]
+dependencies = ["boto3", "PyGithub", "moto[ec2]", "pytest"]
 
 [build-system]
 # We are not going to add versioningit at this time
 requires = ["setuptools >= 61.2"]
 build-backend = "setuptools.build_meta"
 
+[tool.coverage.report]
+exclude_also = ["raise NotImplementedError"]
 
+[tool.pytest.ini_options]
+markers = ["slow: marks test as slow"]
