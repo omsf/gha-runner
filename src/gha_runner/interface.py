@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from importlib.resources import files
 from pathlib import Path
 import boto3
 from string import Template
@@ -98,8 +99,8 @@ class AWS(CloudDeployment):
             waiter.wait(InstanceIds=ids)
 
     def build_user_data(self, **kwargs) -> str:
-        file = Path(os.getcwd(), "templates", "user-script.sh.templ")
-        with open(file, "r") as f:
+        template = files("gha_runner").joinpath("templates/user-script.sh.templ")
+        with template.open() as f:
             template = f.read()
             try:
                 parsed = Template(template)

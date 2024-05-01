@@ -12,6 +12,12 @@ dependencies = ["boto3", "PyGithub", "moto[ec2]", "pytest"]
 requires = ["setuptools >= 61.2"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+gha_runner = ["*.templ", "templates/*.templ"]
+
 [tool.coverage.report]
 exclude_also = ["raise NotImplementedError"]
 
