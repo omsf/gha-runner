@@ -52,6 +52,23 @@ class GitHubInstance:
         ]
         return matchedRunners[0] if matchedRunners else None
 
+    def wait_for_runner(self, label: str, wait: int = 15):
+        """Waits for the runner with the given label to be online.
+
+        Parameters
+        ----------
+        label : str
+            The label of the runner to wait for.
+        wait : int
+            The time in seconds to wait between checks. Defaults to 15 seconds.
+        """
+        runner = self.get_runner(label)
+        while runner is None:
+            print(f"Runner {label} not found. Waiting...")
+            runner = self.get_runner(label)
+            time.sleep(wait)
+        print(f"Runner {label} found!")
+
     def remove_runner(self, label: str):
         runner = self.get_runner(label)
         if runner is not None:
