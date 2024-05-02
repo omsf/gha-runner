@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from importlib.resources import files
-from pathlib import Path
 import boto3
 from string import Template
-import os
 
 
 class CloudDeployment(ABC):
@@ -30,11 +28,11 @@ class AWS(CloudDeployment):
     image_id: str
     instance_type: str
     gh_runner_token: str
-    homedir: str
+    home_dir: str
     repo: str
     tags: list[dict[str, str]]
     region_name: str
-    runnerRelease: str
+    runner_release: str
     labels: str = ""
     subnet_id: str = ""
     security_group_id: str = ""
@@ -46,9 +44,9 @@ class AWS(CloudDeployment):
         userDataParams = {
             "token": self.gh_runner_token,
             "repo": self.repo,
-            "homedir": self.homedir,
+            "homedir": self.home_dir,
             "script": self.script,
-            "runnerRelease": self.runnerRelease,
+            "runnerRelease": self.runner_release,
             "labels": self.labels,
         }
         params = {
