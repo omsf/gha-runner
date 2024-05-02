@@ -2,7 +2,7 @@ from botocore.exceptions import WaiterError
 import pytest
 from moto import mock_aws
 import os
-from gha_runner.interface import AWS
+from gha_runner.clouddeployment import AWS
 
 
 @pytest.fixture(scope="function")
@@ -24,11 +24,58 @@ def aws(aws_credentials):
             "tags": [],
             "region_name": "us-east-1",
             "gh_runner_token": "testing",
-            "homedir": "/home/ec2-user",
-            "runnerRelease": "",
+            "home_dir": "/home/ec2-user",
+            "runner_release": "",
             "repo": "omsf-eco-infra/awsinfratesting",
         }
         yield AWS(**params)
+
+
+def test_build_aws_params():
+    params = {
+        "image_id": "ami-0772db4c976d21e9b",
+        "instance_type": "t2.micro",
+        "tags": [],
+        "region_name": "us-east-1",
+        "gh_runner_token": "testing",
+        "home_dir": "/home/ec2-user",
+        "runner_release": "",
+        "repo": "omsf-eco-infra/awsinfratesting",
+        "subnet_id": "test",
+        "security_group_id": "test",
+        "iam_role": "test",
+    }
+    user_data_params = {
+        "token": "test",
+        "repo": "omsf-eco-infra/awsinfratesting",
+        "homedir": "/home/ec2-user",
+        "script": "echo 'Hello, World!'",
+        "runner_release": "test.tar.gz",
+        "labels": "label",
+    }
+    aws = AWS(**params)
+    params = aws.build_aws_params(1, user_data_params)
+    assert params == {
+        "ImageId": "ami-0772db4c976d21e9b",
+        "InstanceType": "t2.micro",
+        "MinCount": 1,
+        "MaxCount": 1,
+        "SubnetId": "test",
+        "SecurityGroupIds": ["test"],
+        "IamInstanceProfile": {"Name": "test"},
+        "TagSpecifications": [],
+        "UserData": """#!/bin/bash
+cd "/home/ec2-user"
+echo "echo 'Hello, World!'" > pre-runner-script.sh
+source pre-runner-script.sh
+export RUNNER_ALLOW_RUNASROOT=1
+# We will get the latest release from the GitHub API
+curl -L test.tar.gz -o runner.tar.gz
+tar xzf runner.tar.gz
+./config.sh --url https://github.com/omsf-eco-infra/awsinfratesting --token test --labels label --ephemeral
+./run.sh
+""",
+    }
 
 
 def test_create_instance(aws):
@@ -99,7 +146,7 @@ def test_build_user_data(aws):
         "repo": "omsf-eco-infra/awsinfratesting",
         "token": "test",
         "labels": "label",
-        "runnerRelease": "test.tar.gz",
+        "runner_release": "test.tar.gz",
     }
     # We strip this to ensure that we don't have any extra whitespace to fail our test
     user_data = aws.build_user_data(**params).strip()

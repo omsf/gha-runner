@@ -4,7 +4,7 @@ echo "$script" > pre-runner-script.sh
 source pre-runner-script.sh
 export RUNNER_ALLOW_RUNASROOT=1
 # We will get the latest release from the GitHub API
-curl -L $runnerRelease -o runner.tar.gz
+curl -L $runner_release -o runner.tar.gz
 tar xzf runner.tar.gz
 ./config.sh --url https://github.com/$repo --token $token --labels $labels --ephemeral
 ./run.sh

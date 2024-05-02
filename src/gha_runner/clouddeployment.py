@@ -39,6 +39,23 @@ class AWS(CloudDeployment):
     iam_role: str = ""
     script: str = ""
 
+    def build_aws_params(self, count: int, user_data_params: dict) -> dict:
+        params = {
+            "ImageId": self.image_id,
+            "InstanceType": self.instance_type,
+            "MinCount": count,
+            "MaxCount": count,
+            "TagSpecifications": self.tags,
+            "UserData": self.build_user_data(**user_data_params),
+        }
+        if self.subnet_id != "":
+            params["SubnetId"] = self.subnet_id
+        if self.security_group_id != "":
+            params["SecurityGroupIds"] = [self.security_group_id]
+        if self.iam_role != "":
+            params["IamInstanceProfile"] = {"Name": self.iam_role}
+        return params
+
     def create_instance(self, count: int) -> list[str]:
         ec2 = boto3.client("ec2", region_name=self.region_name)
         userDataParams = {
@@ -46,25 +63,10 @@ class AWS(CloudDeployment):
             "repo": self.repo,
             "homedir": self.home_dir,
             "script": self.script,
-            "runnerRelease": self.runner_release,
+            "runner_release": self.runner_release,
             "labels": self.labels,
         }
-        params = {
-            "ImageId": self.image_id,
-            "InstanceType": self.instance_type,
-            "MinCount": count,
-            "MaxCount": count,
-            "TagSpecifications": self.tags,
-            "UserData": self.build_user_data(**userDataParams),
-        }
-        ## These lines help with mocking the AWS calls.
-        ## They allow use to use the default AWS credentials for moto.
-        if self.subnet_id != "":
-            params["SubnetId"] = self.subnet_id
-        if self.security_group_id != "":
-            params["SecurityGroupIds"] = [self.security_group_id]
-        if self.iam_role != "":
-            params["IamInstanceProfile"] = {"Name": self.iam_role}
+        params = self.build_aws_params(count, userDataParams)
         result = ec2.run_instances(**params)
         instances = result["Instances"]
         ids = [instance["InstanceId"] for instance in instances]
