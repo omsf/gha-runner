@@ -36,12 +36,7 @@ def main():
         cloud_params = config["aws"]
         cloud_params["repo"] = gha_params["repo"]
 
-    repo = "omsf-eco-infra/awsinfratesting"
     print("Starting up...")
-    gha_params = {
-        "token": os.environ["GH_PAT"],
-        "repo": repo,
-    }
     # Create a GitHub instance
     gh = GitHubInstance(**gha_params)
     print("Creating GitHub Actions Runner")
