@@ -36,14 +36,13 @@ jobs:
           python -m pip install --no-cache-dir '.[test]'
 
       - name: Run tests
-        # conda setup requires this special shell
-        shell: bash -l {0}
         run: |
           pytest -v --cov=gha_runner --cov-report=xml --color=yes tests/
 
-      # - name: CodeCov
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     file: ./coverage.xml
-      #     flags: unittests
-      #     name: codecov-py${{ matrix.python-version }}
+      - name: CodeCov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-py${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
