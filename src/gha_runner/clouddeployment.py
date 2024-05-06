@@ -69,6 +69,23 @@ class CloudDeployment(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def instance_running(self, id: str) -> bool:
+        """Check if an instance exists.
+
+        Parameters
+        ----------
+        id : str
+            The instance ID to check.
+
+        Returns
+        -------
+        bool
+            True if the instance exists, False otherwise.
+
+        """
+        raise NotImplementedError
+
 
 @dataclass
 class AWS(CloudDeployment):
@@ -160,7 +177,22 @@ class AWS(CloudDeployment):
         else:
             waiter.wait(InstanceIds=ids)
 
-    def build_user_data(self, **kwargs) -> str:
+    def instance_running(self, id: str) -> bool:
+        ec2 = boto3.client("ec2", self.region_name)
+        params = {
+            "InstanceIds": [id],
+        }
+        response = ec2.describe_instances(**params)
+        # Loop through the response to find the state of the instance
+        for reservation in response["Reservations"]:
+            for instance in reservation["Instances"]:
+                instance_state = instance["State"]["Name"]
+                if instance_state == "running":
+                    return True
+                else:
+                    return False
+        return False
+
     def __build_user_data(self, **kwargs) -> str:
         """Build the user data script.
 

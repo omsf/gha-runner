@@ -83,6 +83,26 @@ def test_create_instance(aws):
     assert len(ids) == 1
 
 
+def test_instance_running(aws):
+    ids = aws.create_instance(count=1)
+    assert len(ids) == 1
+    assert aws.instance_running(ids[0])
+
+
+def test_instance_running_dne(aws):
+    # This is a fake instance id
+    ids = ["i-xxxxxxxxxxxxxxxxx"]
+    with pytest.raises(Exception):
+        aws.instance_running(ids[0])
+
+
+def test_instance_running_terminated(aws):
+    ids = aws.create_instance(count=1)
+    assert len(ids) == 1
+    aws.remove_instances(ids)
+    assert not aws.instance_running(ids[0])
+
+
 def test_wait_until_ready(aws):
     ids = aws.create_instance(count=1)
     params = {
@@ -90,6 +110,7 @@ def test_wait_until_ready(aws):
         "Delay": 5,
     }
     aws.wait_until_ready(ids, **params)
+    assert aws.instance_running(ids[0])
 
 
 def test_wait_until_ready_dne(aws):
@@ -115,6 +136,7 @@ def test_remove_instances(aws):
     ids = aws.create_instance(count=1)
     assert len(ids) == 1
     aws.remove_instances(ids)
+    assert not aws.instance_running(ids[0])
 
 
 def test_wait_until_removed(aws):
@@ -126,6 +148,7 @@ def test_wait_until_removed(aws):
         "Delay": 5,
     }
     aws.wait_until_removed(ids, **params)
+    assert not aws.instance_running(ids[0])
 
 
 def test_wait_until_removed_dne(aws):
