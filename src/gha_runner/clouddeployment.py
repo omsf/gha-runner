@@ -146,6 +146,20 @@ class AWS(CloudDeployment):
             waiter.wait(InstanceIds=ids)
 
     def build_user_data(self, **kwargs) -> str:
+    def __build_user_data(self, **kwargs) -> str:
+        """Build the user data script.
+
+        Parameters
+        ----------
+        kwargs : dict
+            A dictionary of parameters to pass to the template.
+
+        Returns
+        -------
+        str
+            The user data script as a string.
+
+        """
         template = importlib.resources.files("gha_runner").joinpath(
             "templates/user-script.sh.templ"
         )

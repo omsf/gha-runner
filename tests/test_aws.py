@@ -149,7 +149,7 @@ def test_build_user_data(aws):
         "runner_release": "test.tar.gz",
     }
     # We strip this to ensure that we don't have any extra whitespace to fail our test
-    user_data = aws.build_user_data(**params).strip()
+    user_data = aws._AWS__build_user_data(**params).strip()
     # We also strip here
     file = """#!/bin/bash
 cd "/home/ec2-user"
@@ -173,4 +173,4 @@ def test_build_user_data_missing_params(aws):
         "token": "test",
     }
     with pytest.raises(Exception):
-        aws.build_user_data(**params)
+        aws._AWS__build_user_data(**params)
