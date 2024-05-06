@@ -6,20 +6,67 @@ from string import Template
 
 
 class CloudDeployment(ABC):
+    """Abstract base class for cloud deployment.
+
+    This class defines the interface for cloud deployment classes.
+
+    """
+
     @abstractmethod
     def create_instance(self, count: int) -> list[str]:
+        """Create instances in the cloud provider and return their IDs.
+
+        Parameters
+        ----------
+        count : int
+            The number of instances to create.
+
+        Returns
+        -------
+        list[str]
+            A list of instance IDs.
+
+        """
         raise NotImplementedError
 
     @abstractmethod
     def remove_instances(self, ids: list[str]):
+        """Remove instances from the cloud provider.
+
+        Parameters
+        ----------
+        ids : list[str]
+            A list of instance IDs to remove.
+
+        """
         raise NotImplementedError
 
     @abstractmethod
     def wait_until_ready(self, ids: list[str], **kwargs):
+        """Wait until instances are in a ready state.
+
+        Parameters
+        ----------
+        ids : list[str]
+            A list of instance IDs to wait for.
+        **kwargs : dict, optional
+            Additional arguments to pass to the waiter.
+
+        """
         raise NotImplementedError
 
     @abstractmethod
     def wait_until_removed(self, ids: list[str], **kwargs):
+        """Wait until instances are removed.
+
+        Parameters
+        ----------
+        ids : list[str]
+            A list of instance IDs to wait for.
+        **kwargs : dict, optional
+            Additional arguments to pass to the waiter.
+
+        """
         raise NotImplementedError
 
 
