@@ -54,7 +54,7 @@ def test_build_aws_params():
         "labels": "label",
     }
     aws = AWS(**params)
-    params = aws.build_aws_params(1, user_data_params)
+    params = aws._AWS__build_aws_params(1, user_data_params)
     assert params == {
         "ImageId": "ami-0772db4c976d21e9b",
         "InstanceType": "t2.micro",
