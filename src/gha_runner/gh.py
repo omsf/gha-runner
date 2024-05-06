@@ -46,6 +46,8 @@ class GitHubInstance:
     def _headers(self, header_kwargs):
         """Generate headers for API requests, adding authorization and specific API version.
 
+        Can be removed if this is added into PyGitHub.
+
         Parameters
         ----------
         header_kwargs : dict
@@ -66,6 +68,10 @@ class GitHubInstance:
         return headers
 
     def _do_request(self, func, endpoint, **kwargs):
+        """Make a request to the GitHub API.
+
+        This can be removed if this is added into PyGitHub.
+        """
         endpoint_url = f"{self.BASE_URL}/{endpoint}"
         headers = self.headers
         resp: requests.Response = func(endpoint_url, headers=headers, **kwargs)
@@ -78,6 +84,8 @@ class GitHubInstance:
 
     def create_runner_token(self) -> str:
         """Generate a registration token for GitHub Actions runners.
+
+        This can be removed if this is added into PyGitHub.
 
         Returns
         -------
@@ -98,6 +106,8 @@ class GitHubInstance:
 
     def post(self, endpoint, **kwargs):
         """Make a POST request to the GitHub API.
+
+        This can be removed if this is added into PyGitHub.
 
         Parameters
         ----------
