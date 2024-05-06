@@ -4,9 +4,9 @@ from gha_runner.clouddeployment import CloudDeploymentFactory, AWS
 
 def test_get_provider():
     factory = CloudDeploymentFactory()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Invalid provider"):
         factory.get_provider("invalid_provider")
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="Invalid configuration"):
         factory.get_provider("aws", invalid_arg="invalid_arg")
     params = {
         "image_id": "ami-0772db4c976d21e9b",
