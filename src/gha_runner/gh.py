@@ -1,3 +1,5 @@
+"""Module to manage GitHub repository actions through the GitHub API."""
+
 from github import Github, Auth
 from github.SelfHostedActionsRunner import SelfHostedActionsRunner
 import requests
@@ -7,8 +9,7 @@ import string
 
 
 class GitHubInstance:
-    """
-    Class to manage GitHub repository actions through the GitHub API.
+    """Class to manage GitHub repository actions through the GitHub API.
 
     Attributes
     ----------
@@ -20,13 +21,13 @@ class GitHubInstance:
         Headers for HTTP requests to GitHub API.
     github : Github
         Instance of Github object for interacting with the GitHub API.
+
     """
 
     BASE_URL = "https://api.github.com"
 
     def __init__(self, token: str, repo: str):
-        """
-        Initializes the GitHubInstance with the provided token and repository.
+        """Initialize the GitHubInstance with the provided token and repository.
 
         Parameters
         ----------
@@ -34,6 +35,7 @@ class GitHubInstance:
             GitHub API token for authentication.
         repo : str
             Full name of the GitHub repository in the format "owner/repo".
+
         """
         self.token = token
         self.headers = self._headers({})
@@ -42,8 +44,7 @@ class GitHubInstance:
         self.repo = repo
 
     def _headers(self, header_kwargs):
-        """
-        Generates headers for API requests, adding authorization and specific API version.
+        """Generate headers for API requests, adding authorization and specific API version.
 
         Parameters
         ----------
@@ -54,6 +55,7 @@ class GitHubInstance:
         -------
         dict
             Headers including authorization, API version, and any additional headers.
+
         """
         headers = {
             "Authorization": f"Bearer {self.token}",
@@ -75,8 +77,7 @@ class GitHubInstance:
             return resp.json()
 
     def create_runner_token(self) -> str:
-        """
-        Generates a registration token for GitHub Actions runners.
+        """Generate a registration token for GitHub Actions runners.
 
         Returns
         -------
@@ -87,6 +88,7 @@ class GitHubInstance:
         ------
         Exception
             If there is an error generating the token.
+
         """
         try:
             res = self.post(f"repos/{self.repo}/actions/runners/registration-token")
@@ -95,11 +97,21 @@ class GitHubInstance:
             raise Exception(f"Error creating runner token: {e}")
 
     def post(self, endpoint, **kwargs):
+        """Make a POST request to the GitHub API.
+
+        Parameters
+        ----------
+        endpoint : str
+            The endpoint to make the request to.
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the request.
+            See the requests.post documentation for more information.
+
+        """
         return self._do_request(requests.post, endpoint, **kwargs)
 
     def get_runner(self, label: str) -> SelfHostedActionsRunner | None:
-        """
-        Retrieves a runner by its label.
+        """Retrieve a runner by its label.
 
         Parameters
         ----------
@@ -110,6 +122,7 @@ class GitHubInstance:
         -------
         SelfHostedActionsRunner | None
             The runner object if found, otherwise None.
+
         """
         runners = self.github.get_repo(self.repo).get_self_hosted_runners()
         matchedRunners = [
@@ -120,7 +133,7 @@ class GitHubInstance:
         return matchedRunners[0] if matchedRunners else None
 
     def wait_for_runner(self, label: str, wait: int = 15):
-        """Waits for the runner with the given label to be online.
+        """Wait for the runner with the given label to be online.
 
         Parameters
         ----------
@@ -128,6 +141,7 @@ class GitHubInstance:
             The label of the runner to wait for.
         wait : int
             The time in seconds to wait between checks. Defaults to 15 seconds.
+
         """
         runner = self.get_runner(label)
         while runner is None:
@@ -137,7 +151,7 @@ class GitHubInstance:
         print(f"Runner {label} found!")
 
     def remove_runner(self, label: str):
-        """Removes a runner by a given label.
+        """Remove a runner by a given label.
 
         Parameters
         ----------
@@ -148,6 +162,7 @@ class GitHubInstance:
         ------
         RuntimeError
             If there is an error removing the runner or the runner is not found.
+
         """
         runner = self.get_runner(label)
         if runner is not None:
@@ -159,8 +174,7 @@ class GitHubInstance:
 
     @staticmethod
     def generate_random_label() -> str:
-        """
-        Generates a random label for a runner.
+        """Generate a random label for a runner.
 
         Returns
         -------
@@ -168,13 +182,14 @@ class GitHubInstance:
             A random label for a runner. The label is in the format
             "runner-<random_string>". The random string is 8 characters long
             and consists of lowercase letters and digits.
+
         """
         letters = string.ascii_lowercase + string.digits
         result_str = "".join(random.choice(letters) for i in range(8))
         return f"runner-{result_str}"
 
     def get_latest_runner_release(self, platform: str, architecture: str) -> str:
-        """Returns the latest runner for the given platform and architecture.
+        """Return the latest runner for the given platform and architecture.
 
         Parameters
         ----------
@@ -192,6 +207,7 @@ class GitHubInstance:
         ------
         RuntimeError
             If the runner is not found for the given platform and architecture.
+
         """
         repo = "actions/runner"
         release = self.github.get_repo(repo).get_latest_release()
