@@ -124,4 +124,4 @@ class CloudDeploymentFactory:
                     f"Invalid configuration for provider {provider_name}: {t}"
                 )
         else:
-            raise ValueError("Invalid provider name")
+            raise ValueError(f"Invalid provider name: '{provider_name}'")
