@@ -8,6 +8,14 @@ import random
 import string
 
 
+class TokenRetrievalError(Exception):
+    """Exception raised when there is an error retrieving a token from GitHub."""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
 class GitHubInstance:
     """Class to manage GitHub repository actions through the GitHub API.
 
@@ -94,7 +102,7 @@ class GitHubInstance:
 
         Raises
         ------
-        Exception
+        TokenCreationError
             If there is an error generating the token.
 
         """
@@ -102,7 +110,7 @@ class GitHubInstance:
             res = self.post(f"repos/{self.repo}/actions/runners/registration-token")
             return res["token"]
         except Exception as e:
-            raise Exception(f"Error creating runner token: {e}")
+            raise TokenRetrievalError(f"Error creating runner token: {e}")
 
     def post(self, endpoint, **kwargs):
         """Make a POST request to the GitHub API.
