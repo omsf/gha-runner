@@ -34,6 +34,11 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install --no-cache-dir .
           python -m pip install --no-cache-dir '.[test]'
+          cd tests/
+
+      - name: List versions
+        run: |
+          python -m pip list
 
       - name: Run tests
         run: |
