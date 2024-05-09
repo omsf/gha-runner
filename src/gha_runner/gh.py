@@ -11,40 +11,30 @@ import string
 class TokenRetrievalError(Exception):
     """Exception raised when there is an error retrieving a token from GitHub."""
 
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
 
 class GitHubInstance:
     """Class to manage GitHub repository actions through the GitHub API.
 
-    Attributes
+    Parameters
     ----------
     token : str
         GitHub API token for authentication.
     repo : str
         Full name of the GitHub repository in the format "owner/repo".
+
+    Attributes
+    ----------
     headers : dict
         Headers for HTTP requests to GitHub API.
     github : Github
         Instance of Github object for interacting with the GitHub API.
+
 
     """
 
     BASE_URL = "https://api.github.com"
 
     def __init__(self, token: str, repo: str):
-        """Initialize the GitHubInstance with the provided token and repository.
-
-        Parameters
-        ----------
-        token : str
-            GitHub API token for authentication.
-        repo : str
-            Full name of the GitHub repository in the format "owner/repo".
-
-        """
         self.token = token
         self.headers = self._headers({})
         auth = Auth.Token(token)
