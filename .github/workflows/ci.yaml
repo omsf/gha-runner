@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test on ubuntu-latest, Python ${{ matrix.python-version }}
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Additional info about the build
+        shell: bash
+        run: |
+          uname -a
+          df -h
+          ulimit -a
+
+      - name: Setup Python ${{matrix.python-version}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --no-cache-dir .
+          python -m pip install --no-cache-dir '.[test]'
+
+      - name: List versions
+        run: |
+          python -m pip list
+
+      - name: Run tests
+        run: |
+          cd tests/
+          pytest -v --cov=gha_runner --cov-report=xml --color=yes .
+
+      - name: CodeCov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-py${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
