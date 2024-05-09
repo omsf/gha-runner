@@ -34,7 +34,6 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install --no-cache-dir .
           python -m pip install --no-cache-dir '.[test]'
-          cd tests/
 
       - name: List versions
         run: |
@@ -42,7 +41,8 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -v --cov=gha_runner --cov-report=xml --color=yes tests/
+          cd tests/
+          pytest -v --cov=gha_runner --cov-report=xml --color=yes .
 
       - name: CodeCov
         uses: codecov/codecov-action@v4
