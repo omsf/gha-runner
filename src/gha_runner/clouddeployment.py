@@ -103,7 +103,7 @@ class AWS(CloudDeployment):
     iam_role: str = ""
     script: str = ""
 
-    def __build_aws_params(self, count: int, user_data_params: dict) -> dict:
+    def _build_aws_params(self, count: int, user_data_params: dict) -> dict:
         """Build the parameters for the AWS API call.
 
         Parameters
@@ -125,7 +125,7 @@ class AWS(CloudDeployment):
             "MinCount": count,
             "MaxCount": count,
             "TagSpecifications": self.tags,
-            "UserData": self.__build_user_data(**user_data_params),
+            "UserData": self._build_user_data(**user_data_params),
         }
         if self.subnet_id != "":
             params["SubnetId"] = self.subnet_id
@@ -145,7 +145,7 @@ class AWS(CloudDeployment):
             "runner_release": self.runner_release,
             "labels": self.labels,
         }
-        params = self.__build_aws_params(count, userDataParams)
+        params = self._build_aws_params(count, userDataParams)
         result = ec2.run_instances(**params)
         instances = result["Instances"]
         ids = [instance["InstanceId"] for instance in instances]
@@ -193,7 +193,7 @@ class AWS(CloudDeployment):
                     return False
         return False
 
-    def __build_user_data(self, **kwargs) -> str:
+    def _build_user_data(self, **kwargs) -> str:
         """Build the user data script.
 
         Parameters
