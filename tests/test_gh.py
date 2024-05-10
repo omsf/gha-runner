@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock, Mock
+from gha_runner.gh import TokenRetrievalError
 
 
 @pytest.fixture
@@ -167,23 +168,23 @@ def test_post(post_fixture):
     mock_response.json.assert_called_once()
 
 
-def test_create_runner_token(post_fixture):
+@pytest.mark.parametrize(
+    "status_code, ok, content, error",
+    [(200, True, None, None), (404, False, "Not Found", TokenRetrievalError)],
+)
+def test_create_runner_token(post_fixture, status_code, ok, content, error):
     instance, mock_response = post_fixture
-    response = instance.create_runner_token()
-    assert response == mock_response.json.return_value["token"]
-    mock_response.json.assert_called_once()
-
-
-def test_create_runner_token_fail(post_fixture):
-    from gha_runner.gh import TokenRetrievalError
-
-    instance, mock_response = post_fixture
-    mock_response.status_code = 404
-    mock_response.ok = False
-    mock_response.content = "Not Found"
-    error = f"Error creating runner token: Error in API call for https://api.github.com/repos/testing/testing/actions/runners/registration-token: {mock_response.content}"
-    with pytest.raises(TokenRetrievalError, match=error):
-        instance.create_runner_token()
+    mock_response.status_code = status_code
+    mock_response.ok = ok
+    mock_response.content = content
+    error_str = f"Error creating runner token: Error in API call for https://api.github.com/repos/testing/testing/actions/runners/registration-token: {mock_response.content}"
+    if error:
+        with pytest.raises(error, match=error_str):
+            instance.create_runner_token()
+    else:
+        response = instance.create_runner_token()
+        assert response == mock_response.json.return_value["token"]
+        mock_response.json.assert_called_once()
 
 
 def test_generate_random_label(github_release_mock):
