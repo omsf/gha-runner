@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock, Mock
-from gha_runner.gh import TokenRetrievalError
+from gha_runner.gh import TokenRetrievalError, GitHubInstance
 
 
 @pytest.fixture
@@ -27,8 +27,6 @@ def github_release_mock():
         mock_repo.get_self_hosted_runners.return_value = mock_runners
         mock_release.get_assets.return_value = [mock_asset]
         mock_repo.remove_self_hosted_runner.return_value = True
-
-        from gha_runner.gh import GitHubInstance
 
         instance = GitHubInstance("test", "testing/testing")
 
@@ -196,8 +194,6 @@ def test_generate_random_label(github_release_mock):
 
 @pytest.fixture
 def mock_get_runner(monkeypatch):
-    from gha_runner.gh import GitHubInstance
-
     label = "runner-linux-x64"
     side_effect = [None, None, {"label": label}]
     missing_str = f"Runner {label} not found. Waiting...\n"
