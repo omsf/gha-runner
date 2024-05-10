@@ -80,23 +80,23 @@ def test_get_runner(github_release_mock, label, expected):
         assert result is None
 
 
-def test_remove_runner_exists(github_release_mock):
+@pytest.mark.parametrize(
+    "label, error, match",
+    [
+        ("runner-linux-x64", None, None),
+        ("runner-linux-x64", RuntimeError, "Error removing runner runner-linux-x64"),
+        ("non-existent-runner", RuntimeError, "Runner non-existent-runner not found"),
+    ],
+)
+def test_remove_runner(github_release_mock, label, error, match):
     instance, _, mock_repo = github_release_mock
-    instance.remove_runner("runner-linux-x64")
-    mock_repo.remove_self_hosted_runner.assert_called_once()
-
-
-def test_remove_runner_dne(github_release_mock):
-    instance, _, mock_repo = github_release_mock
-    mock_repo.remove_self_hosted_runner.return_value = False
-    with pytest.raises(RuntimeError, match="Error removing runner runner-linux-x64"):
-        instance.remove_runner("runner-linux-x64")
-
-
-def test_remove_runner_not_found(github_release_mock):
-    instance, _, _ = github_release_mock
-    with pytest.raises(RuntimeError, match="Runner non-existent-runner not found"):
-        instance.remove_runner("non-existent-runner")
+    if error:
+        mock_repo.remove_self_hosted_runner.return_value = False
+        with pytest.raises(RuntimeError, match=match):
+            instance.remove_runner(label)
+    else:
+        instance.remove_runner(label)
+        mock_repo.remove_self_hosted_runner.assert_called_once()
 
 
 def test_headers(github_release_mock):
