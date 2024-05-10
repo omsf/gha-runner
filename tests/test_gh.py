@@ -110,36 +110,39 @@ def test_headers(github_release_mock):
     assert instance.headers == headers
 
 
-def test_do_request(github_release_mock):
+@pytest.mark.parametrize(
+    "status_code, ok, content, error, match",
+    [
+        (200, True, None, None, None),
+        (
+            404,
+            False,
+            "Not Found",
+            RuntimeError,
+            "Error in API call for https://api.github.com/mock/test: Not Found",
+        ),
+    ],
+)
+def test_do_request(github_release_mock, status_code, ok, content, error, match):
     import requests
 
-    """Tests that the request is made correctly."""
     instance, _, _ = github_release_mock
     mock_response = Mock(spec=requests.Response)
-    mock_response.status_code = 200
+    mock_response.status_code = status_code
     mock_response.json.return_value = {
         "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO6",
         "expires_at": "2020-01-22T12:13:35.123-08:00",
     }
-    with patch("requests.get", return_value=mock_response) as mock_func:
-        response = instance._do_request(mock_func, "https://api.github.com")
-        assert response == mock_response.json.return_value
-
-
-def test_do_request_fail(github_release_mock):
-    import requests
-
-    """Tests that the request is made correctly."""
-    instance, _, _ = github_release_mock
+    mock_response.ok = ok
+    mock_response.content = content
     endpoint = "/mock/test"
-    mock_response = Mock(spec=requests.Response)
-    mock_response.status_code = 404
-    mock_response.ok = False
-    mock_response.content = "Not Found"
-    error = f"Error in API call for https://api.github.com{endpoint}: {mock_response.content}"
     with patch("requests.get", return_value=mock_response) as mock_func:
-        with pytest.raises(RuntimeError, match=error):
-            instance._do_request(mock_func, endpoint)
+        if error:
+            with pytest.raises(error, match=match):
+                instance._do_request(mock_func, endpoint)
+        else:
+            response = instance._do_request(mock_func, endpoint)
+            assert response == mock_response.json.return_value
 
 
 @pytest.fixture
