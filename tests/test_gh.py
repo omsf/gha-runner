@@ -153,19 +153,19 @@ def post_fixture(github_release_mock):
         "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO6",
         "expires_at": "2020-01-22T12:13:35.123-08:00",
     }
-    with patch("requests.post", return_value=mock_response) as mock_func:
-        yield instance, mock_response, mock_func
+    with patch("requests.post", return_value=mock_response):
+        yield instance, mock_response
 
 
 def test_post(post_fixture):
-    instance, mock_response, mock_func = post_fixture
+    instance, mock_response = post_fixture
     response = instance.post("https://api.github.com", data={"key": "value"})
     assert response == mock_response.json.return_value
     mock_response.json.assert_called_once()
 
 
 def test_create_runner_token(post_fixture):
-    instance, mock_response, mock_func = post_fixture
+    instance, mock_response = post_fixture
     response = instance.create_runner_token()
     assert response == mock_response.json.return_value["token"]
     mock_response.json.assert_called_once()
@@ -174,7 +174,7 @@ def test_create_runner_token(post_fixture):
 def test_create_runner_token_fail(post_fixture):
     from gha_runner.gh import TokenRetrievalError
 
-    instance, mock_response, mock_func = post_fixture
+    instance, mock_response = post_fixture
     mock_response.status_code = 404
     mock_response.ok = False
     mock_response.content = "Not Found"
