@@ -188,3 +188,35 @@ def test_generate_random_label(github_release_mock):
     with patch("random.choice", return_value="a"):
         label = instance.generate_random_label()
         assert label == f"runner-{'a'*8}"
+
+
+@pytest.fixture
+def mock_get_runner(monkeypatch):
+    from gha_runner.gh import GitHubInstance
+
+    label = "runner-linux-x64"
+    side_effect = [None, None, {"label": label}]
+    missing_str = f"Runner {label} not found. Waiting...\n"
+    found_str = f"Runner {label} found!\n"
+    # Dynamically build out the expected calls based on the side_effect
+    expected_calls = [missing_str if x is None else found_str for x in side_effect]
+
+    get_runner_mock = MagicMock()
+    # Setup the side_effect for the get_runner_mock
+    get_runner_mock.side_effect = side_effect
+    monkeypatch.setattr(GitHubInstance, "get_runner", get_runner_mock)
+    return get_runner_mock, label, expected_calls
+
+
+def test_wait_for_runner(github_release_mock, mock_get_runner, capsys):
+    instance, _, _ = github_release_mock
+    get_runner_mock, label, expected_calls = mock_get_runner
+    instance.wait_for_runner(label, wait=1)
+    captured = capsys.readouterr()
+    # Combine all expected calls into a single string
+    combined = "".join(expected_calls)
+
+    # Validate that the expected output matches the captured output
+    assert captured.out == combined
+    # Validate that the get_runner method was called the correct number of times
+    assert get_runner_mock.call_count == len(expected_calls)
