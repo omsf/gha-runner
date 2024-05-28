@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, Mock
 from gha_runner.gh import TokenRetrievalError, GitHubInstance
+from github import SelfHostedActionsRunner
 
 
 @pytest.fixture
@@ -63,9 +64,8 @@ def test_get_latest_runner_release(
 @pytest.mark.parametrize(
     "label, expected",
     [
-        # TODO: Mock the expected object and test the get_runner method
         # Test case where the runner exists
-        ("runner-linux-x64", True),
+        ("runner-linux-x64", SelfHostedActionsRunner),
         # Test case where the runner does not exist
         ("runner-darwin-x64", None),
     ],
@@ -73,10 +73,7 @@ def test_get_latest_runner_release(
 def test_get_runner(github_release_mock, label, expected):
     instance, _, _ = github_release_mock
     result = instance.get_runner(label)
-    if expected is not None:
-        assert result is not None
-    else:
-        assert result is None
+    assert (result is not None) == (expected is not None)
 
 
 @pytest.mark.parametrize(
