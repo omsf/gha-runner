@@ -151,19 +151,6 @@ class AWS(CloudDeployment):
             result = ec2.run_instances(**params)
             instances = result["Instances"]
             ids += [instance["InstanceId"] for instance in instances]
-            # ids = [instance["InstanceId"] for instance in instances]
-            # userDataParams = {
-            #     "token": self.gh_runner_token,
-            #     "repo": self.repo,
-            #     "homedir": self.home_dir,
-            #     "script": self.script,
-            #     "runner_release": self.runner_release,
-            #     "labels": self.labels,
-            # }
-            # params = self._build_aws_params(count, userDataParams)
-            # result = ec2.run_instances(**params)
-            # instances = result["Instances"]
-        # ids = [instance["InstanceId"] for instance in instances]
         return ids
 
     def remove_instances(self, ids: list[str]):
