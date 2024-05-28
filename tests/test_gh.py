@@ -85,6 +85,8 @@ def test_get_runners(github_release_mock):
     instance, _, _ = github_release_mock
     runners = instance.get_runners("runner-linux-x64")
     assert len(runners) == 2
+    assert isinstance(runners[0], SelfHostedActionsRunner)
+    assert isinstance(runners[1], SelfHostedActionsRunner)
 
 
 @pytest.mark.parametrize(
