@@ -2,6 +2,7 @@
 
 from github import Github, Auth
 from github.SelfHostedActionsRunner import SelfHostedActionsRunner
+import urllib.parse
 import requests
 import time
 import random
@@ -70,7 +71,7 @@ class GitHubInstance:
 
         This can be removed if this is added into PyGitHub.
         """
-        endpoint_url = f"{self.BASE_URL}/{endpoint}"
+        endpoint_url = urllib.parse.urljoin(self.BASE_URL, endpoint)
         headers = self.headers
         resp: requests.Response = func(endpoint_url, headers=headers, **kwargs)
         if not resp.ok:
