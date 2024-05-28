@@ -15,11 +15,7 @@ class CloudDeployment(ABC):
     @abstractmethod
     def create_instances(self) -> list[str]:
         """Create instances in the cloud provider and return their IDs.
-
-        Parameters
-        ----------
-        count : int
-            The number of instances to create.
+        The number of instances to create is defined by the implementation.
 
         Returns
         -------
