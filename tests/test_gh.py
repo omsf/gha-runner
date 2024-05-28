@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, Mock
 from gha_runner.gh import TokenRetrievalError, GitHubInstance
-from github import SelfHostedActionsRunner
+from github.SelfHostedActionsRunner import SelfHostedActionsRunner
 
 
 @pytest.fixture
@@ -10,7 +10,7 @@ def github_release_mock():
     mock_release = MagicMock()
     mock_asset = MagicMock()
     mock_runners = MagicMock()
-    runner = MagicMock()
+    runner = MagicMock(spec=SelfHostedActionsRunner)
 
     # Setup fixed attributes for mocks
     asset_name = "runner-linux-x64.tar.gz"
@@ -73,6 +73,8 @@ def test_get_latest_runner_release(
 def test_get_runner(github_release_mock, label, expected):
     instance, _, _ = github_release_mock
     result = instance.get_runner(label)
+    if expected:
+        assert isinstance(result, expected)
     assert (result is not None) == (expected is not None)
 
 
