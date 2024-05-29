@@ -267,8 +267,6 @@ def test_create_github_runners(github_release_mock, post_fixture_multi):
     assert len(out) == count
     for idx, resp in enumerate(responses):
         assert out[idx] == resp["json"]["token"]
-    # for response, idx in enumerate(responses):
-    #     assert response == out[idx]
 
     assert json_mock.call_count == count
 
