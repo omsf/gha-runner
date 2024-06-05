@@ -180,12 +180,12 @@ class GitHubInstance:
             The list of runners removed if found, otherwise None.
         """
         runners = self.github.get_repo(self.repo).get_self_hosted_runners()
-        matchedRunners = [
+        matched_runners = [
             runner
             for runner in runners
             if label in [l["name"] for l in runner.labels()]
         ]
-        return matchedRunners if matchedRunners else None
+        return matched_runners if matched_runners else None
 
     def wait_for_runner(self, label: str, wait: int = 15):
         """Wait for the runner with the given label to be online.
