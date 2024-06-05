@@ -13,7 +13,7 @@ def test_get_provider():
         "instance_type": "t2.micro",
         "tags": [],
         "region_name": "us-east-1",
-        "gh_runner_token": "testing",
+        "gh_runner_tokens": ["testing"],
         "home_dir": "/home/ec2-user",
         "runner_release": "",
         "repo": "omsf-eco-infra/awsinfratesting",

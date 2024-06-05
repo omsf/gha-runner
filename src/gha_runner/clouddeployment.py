@@ -13,13 +13,9 @@ class CloudDeployment(ABC):
     """
 
     @abstractmethod
-    def create_instance(self, count: int) -> list[str]:
+    def create_instances(self) -> list[str]:
         """Create instances in the cloud provider and return their IDs.
-
-        Parameters
-        ----------
-        count : int
-            The number of instances to create.
+        The number of instances to create is defined by the implementation.
 
         Returns
         -------
@@ -91,7 +87,7 @@ class CloudDeployment(ABC):
 class AWS(CloudDeployment):
     image_id: str
     instance_type: str
-    gh_runner_token: str
+    gh_runner_tokens: list[str]
     home_dir: str
     repo: str
     tags: list[dict[str, str]]
@@ -103,7 +99,7 @@ class AWS(CloudDeployment):
     iam_role: str = ""
     script: str = ""
 
-    def _build_aws_params(self, count: int, user_data_params: dict) -> dict:
+    def _build_aws_params(self, user_data_params: dict) -> dict:
         """Build the parameters for the AWS API call.
 
         Parameters
@@ -122,8 +118,8 @@ class AWS(CloudDeployment):
         params = {
             "ImageId": self.image_id,
             "InstanceType": self.instance_type,
-            "MinCount": count,
-            "MaxCount": count,
+            "MinCount": 1,
+            "MaxCount": 1,
             "TagSpecifications": self.tags,
             "UserData": self._build_user_data(**user_data_params),
         }
@@ -135,20 +131,22 @@ class AWS(CloudDeployment):
             params["IamInstanceProfile"] = {"Name": self.iam_role}
         return params
 
-    def create_instance(self, count: int) -> list[str]:
+    def create_instances(self) -> list[str]:
         ec2 = boto3.client("ec2", region_name=self.region_name)
-        userDataParams = {
-            "token": self.gh_runner_token,
-            "repo": self.repo,
-            "homedir": self.home_dir,
-            "script": self.script,
-            "runner_release": self.runner_release,
-            "labels": self.labels,
-        }
-        params = self._build_aws_params(count, userDataParams)
-        result = ec2.run_instances(**params)
-        instances = result["Instances"]
-        ids = [instance["InstanceId"] for instance in instances]
+        ids = []
+        for token in self.gh_runner_tokens:
+            userDataParams = {
+                "token": token,
+                "repo": self.repo,
+                "homedir": self.home_dir,
+                "script": self.script,
+                "runner_release": self.runner_release,
+                "labels": self.labels,
+            }
+            params = self._build_aws_params(userDataParams)
+            result = ec2.run_instances(**params)
+            instances = result["Instances"]
+            ids += [instance["InstanceId"] for instance in instances]
         return ids
 
     def remove_instances(self, ids: list[str]):

@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock, Mock
+
 from gha_runner.gh import TokenRetrievalError, GitHubInstance
 from github.SelfHostedActionsRunner import SelfHostedActionsRunner
 
@@ -11,6 +12,7 @@ def github_release_mock():
     mock_asset = MagicMock()
     mock_runners = MagicMock()
     runner = MagicMock(spec=SelfHostedActionsRunner)
+    runner2 = MagicMock(spec=SelfHostedActionsRunner)
 
     # Setup fixed attributes for mocks
     asset_name = "runner-linux-x64.tar.gz"
@@ -18,7 +20,8 @@ def github_release_mock():
     mock_asset.name = asset_name
     mock_asset.browser_download_url = asset_url
     runner.labels.return_value = [{"name": "runner-linux-x64"}]
-    mock_runners.__iter__.return_value = [runner]
+    runner2.labels.return_value = [{"name": "runner-linux-x64"}]
+    mock_runners.__iter__.return_value = [runner, runner2]
 
     # Using patch as a context manager inside the fixture
     with patch("gha_runner.gh.Github") as mock_github:
@@ -76,6 +79,38 @@ def test_get_runner(github_release_mock, label, expected):
     if expected:
         assert isinstance(result, expected)
     assert (result is not None) == (expected is not None)
+
+
+def test_get_runners(github_release_mock):
+    instance, _, _ = github_release_mock
+    runners = instance.get_runners("runner-linux-x64")
+    assert len(runners) == 2
+    assert isinstance(runners[0], SelfHostedActionsRunner)
+    assert isinstance(runners[1], SelfHostedActionsRunner)
+
+
+@pytest.mark.parametrize(
+    "label, error, match",
+    [
+        ("runner-linux-x64", None, None),
+        ("runner-darwin-x64", RuntimeError, "Runner runner-darwin-x64 not found"),
+    ],
+)
+def test_remove_runners(github_release_mock, label, error, match):
+    instance, _, mock_repo = github_release_mock
+    if error:
+        with pytest.raises(RuntimeError, match=match):
+            instance.remove_runners(label)
+    else:
+        instance.remove_runners(label)
+        assert mock_repo.remove_self_hosted_runner.call_count == 2
+
+
+def test_remove_runners_fail(github_release_mock):
+    instance, _, mock_repo = github_release_mock
+    mock_repo.remove_self_hosted_runner.return_value = False
+    with pytest.raises(RuntimeError, match="Error removing runner runner-linux-x64"):
+        instance.remove_runners("runner-linux-x64")
 
 
 @pytest.mark.parametrize(
@@ -182,6 +217,100 @@ def test_create_runner_token(post_fixture, status_code, ok, content, error):
         response = instance.create_runner_token()
         assert response == mock_response.json.return_value["token"]
         mock_response.json.assert_called_once()
+
+
+@pytest.fixture
+def post_fixture_multi(monkeypatch):
+    import requests
+
+    responses = [
+        {
+            "status_code": 200,
+            "json": {
+                "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO6",
+                "expires_at": "2020-01-22T12:13:35.123-08:00",
+            },
+        },
+        {
+            "status_code": 200,
+            "json": {
+                "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO7",
+                "expires_at": "2020-01-22T12:13:35.123-08:00",
+            },
+        },
+        {
+            "status_code": 200,
+            "json": {
+                "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO8",
+                "expires_at": "2020-01-22T12:13:35.123-08:00",
+            },
+        },
+    ]
+
+    def side_effect(*args, **kwargs):
+        response = responses.pop(0)
+        mock_response = Mock(spec=requests.Response)
+        mock_response.status_code = response["status_code"]
+        mock_response.json.return_value = response["json"]
+        return mock_response
+
+    mock = Mock(side_effect=side_effect)
+    monkeypatch.setattr(requests, "post", mock)
+    return mock, responses
+
+
+def test_create_github_runners(github_release_mock, post_fixture_multi):
+    instance, _, _ = github_release_mock
+    json_mock, responses = post_fixture_multi
+    count = len(responses)
+    out = instance.create_runner_tokens(count)
+    assert len(out) == count
+    for idx, resp in enumerate(responses):
+        assert out[idx] == resp["json"]["token"]
+
+    assert json_mock.call_count == count
+
+
+@pytest.fixture
+def post_fixture_multi_fail(monkeypatch):
+    import requests
+
+    responses = [
+        {
+            "status_code": 200,
+            "json": {
+                "token": "LLBF3JGZDX3P5PMEXLND6TS6FCWO6",
+                "expires_at": "2020-01-22T12:13:35.123-08:00",
+            },
+        },
+        {
+            "status_code": 404,
+            "json": {
+                "message": "Not Found",
+            },
+        },
+    ]
+
+    def side_effect(*args, **kwargs):
+        response = responses.pop(0)
+        mock_response = Mock(spec=requests.Response)
+        mock_response.status_code = response["status_code"]
+        mock_response.json.return_value = response["json"]
+        mock_response.ok = response["status_code"] == 200
+        return mock_response
+
+    mock = Mock(side_effect=side_effect)
+    monkeypatch.setattr(requests, "post", mock)
+    return mock, responses
+
+
+def test_create_github_runners_exception(github_release_mock, post_fixture_multi_fail):
+    instance, _, _ = github_release_mock
+    json_mock, responses = post_fixture_multi_fail
+    count = len(responses)
+    with pytest.raises(TokenRetrievalError):
+        instance.create_runner_tokens(count)
+        assert json_mock.call_count == count
 
 
 def test_generate_random_label(github_release_mock):

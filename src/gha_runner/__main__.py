@@ -41,13 +41,13 @@ def main():
     gh = GitHubInstance(**gha_params)
     print("Creating GitHub Actions Runner")
     # We need to create a runner token first
-    runner_token = gh.create_runner_token()
-    cloud_params["gh_runner_token"] = runner_token
+    runner_tokens = gh.create_runner_tokens(count=1)
+    cloud_params["gh_runner_tokens"] = runner_tokens
     # We will also get the latest runner release
     release = gh.get_latest_runner_release(platform="linux", architecture="x64")
     cloud_params["runner_release"] = release
     cloud = CloudDeploymentFactory().get_provider("aws", **cloud_params)
-    ids = cloud.create_instance(count=1)
+    ids = cloud.create_instances()
     print(ids)
     print("Waiting for instance to be ready...")
     cloud.wait_until_ready(ids)

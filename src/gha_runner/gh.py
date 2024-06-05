@@ -81,6 +81,30 @@ class GitHubInstance:
         else:
             return resp.json()
 
+    def create_runner_tokens(self, count: int) -> list[str]:
+        """Generate registration tokens for GitHub Actions runners.
+        This can be removed if this is added into PyGitHub.
+
+        Parameters
+        ----------
+        count : int
+            The number of runner tokens to generate.
+        Returns
+        -------
+        list[str]
+            A list of runner registration tokens.
+        Raises
+        ------
+        TokenCreationError
+            If there is an error generating the tokens.
+
+        """
+        tokens = []
+        for _ in range(count):
+            token = self.create_runner_token()
+            tokens.append(token)
+        return tokens
+
     def create_runner_token(self) -> str:
         """Generate a registration token for GitHub Actions runners.
 
@@ -93,7 +117,7 @@ class GitHubInstance:
 
         Raises
         ------
-        TokenCreationError
+        TokenRetrievalError
             If there is an error generating the token.
 
         """
@@ -141,6 +165,25 @@ class GitHubInstance:
         ]
         return matchedRunners[0] if matchedRunners else None
 
+    def get_runners(self, label: str) -> list[SelfHostedActionsRunner] | None:
+        """Get runners by their label.
+        Parameters
+        ----------
+        label : str
+            The label of the runners to retrieve.
+        Returns
+        -------
+        list[SelfHostedActionsRunner] | None
+            The list of runners if found, otherwise None.
+        """
+        runners = self.github.get_repo(self.repo).get_self_hosted_runners()
+        matched_runners = [
+            runner
+            for runner in runners
+            if label in [l["name"] for l in runner.labels()]
+        ]
+        return matched_runners if matched_runners else None
+
     def wait_for_runner(self, label: str, wait: int = 15):
         """Wait for the runner with the given label to be online.
 
@@ -178,6 +221,31 @@ class GitHubInstance:
             removed = self.github.get_repo(self.repo).remove_self_hosted_runner(runner)
             if not removed:
                 raise RuntimeError(f"Error removing runner {label}")
+        else:
+            raise RuntimeError(f"Runner {label} not found")
+
+    def remove_runners(self, label: str):
+        """Remove runners by their label.
+
+        Parameters
+        ----------
+        label : str
+            The label of the runners to remove.
+
+        Raises
+        ------
+        RuntimeError
+            If there is an error removing the runners or the runners are not found.
+
+        """
+        runners = self.get_runners(label)
+        if runners is not None:
+            for runner in runners:
+                removed = self.github.get_repo(self.repo).remove_self_hosted_runner(
+                    runner
+                )
+                if not removed:
+                    raise RuntimeError(f"Error removing runner {label}")
         else:
             raise RuntimeError(f"Runner {label} not found")
 

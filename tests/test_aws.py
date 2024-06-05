@@ -23,7 +23,8 @@ def aws(aws_credentials):
             "instance_type": "t2.micro",
             "tags": [],
             "region_name": "us-east-1",
-            "gh_runner_token": "testing",
+            # "gh_runner_token": "testing",
+            "gh_runner_tokens": ["testing"],
             "home_dir": "/home/ec2-user",
             "runner_release": "",
             "repo": "omsf-eco-infra/awsinfratesting",
@@ -37,7 +38,7 @@ def test_build_aws_params():
         "instance_type": "t2.micro",
         "tags": [],
         "region_name": "us-east-1",
-        "gh_runner_token": "testing",
+        "gh_runner_tokens": ["testing"],
         "home_dir": "/home/ec2-user",
         "runner_release": "",
         "repo": "omsf-eco-infra/awsinfratesting",
@@ -54,7 +55,7 @@ def test_build_aws_params():
         "labels": "label",
     }
     aws = AWS(**params)
-    params = aws._build_aws_params(1, user_data_params)
+    params = aws._build_aws_params(user_data_params)
     assert params == {
         "ImageId": "ami-0772db4c976d21e9b",
         "InstanceType": "t2.micro",
@@ -78,13 +79,13 @@ tar xzf runner.tar.gz
     }
 
 
-def test_create_instance(aws):
-    ids = aws.create_instance(count=1)
+def test_create_instances(aws):
+    ids = aws.create_instances()
     assert len(ids) == 1
 
 
 def test_instance_running(aws):
-    ids = aws.create_instance(count=1)
+    ids = aws.create_instances()
     assert len(ids) == 1
     assert aws.instance_running(ids[0])
 
@@ -97,14 +98,14 @@ def test_instance_running_dne(aws):
 
 
 def test_instance_running_terminated(aws):
-    ids = aws.create_instance(count=1)
+    ids = aws.create_instances()
     assert len(ids) == 1
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
 
 def test_wait_until_ready(aws):
-    ids = aws.create_instance(count=1)
+    ids = aws.create_instances()
     params = {
         "MaxAttempts": 1,
         "Delay": 5,
@@ -133,14 +134,14 @@ def test_wait_until_ready_dne_long(aws):
 
 
 def test_remove_instances(aws):
-    ids = aws.create_instance(count=1)
+    ids = aws.create_instances()
     assert len(ids) == 1
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
 
 def test_wait_until_removed(aws):
-    ids = aws.create_instance(count=1)
+    ids = aws.create_instances()
     assert len(ids) == 1
     aws.remove_instances(ids)
     params = {
