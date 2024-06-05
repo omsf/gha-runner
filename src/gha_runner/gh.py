@@ -169,15 +169,15 @@ class GitHubInstance:
         return matchedRunners[0] if matchedRunners else None
 
     def get_runners(self, label: str) -> list[SelfHostedActionsRunner] | None:
-        """Remove runners by their label.
+        """Get runners by their label.
         Parameters
         ----------
         label : str
-            The label of the runners to remove.
+            The label of the runners to retrieve.
         Returns
         -------
         list[SelfHostedActionsRunner] | None
-            The list of runners removed if found, otherwise None.
+            The list of runners if found, otherwise None.
         """
         runners = self.github.get_repo(self.repo).get_self_hosted_runners()
         matched_runners = [
