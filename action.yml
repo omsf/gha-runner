@@ -1,0 +1,55 @@
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+inputs:
+  repo:
+    description: "The repo to run against"
+    required: false
+  gh_pat:
+    description: "The GHA PAT"
+    required: true
+  action:
+    description: 'Whether to start or stop. Options: "start", "stop"'
+    required: true
+  provider:
+    description: 'The cloud provider to use to provision a runner. Example: "aws"'
+    required: true
+  gh_runner_labels:
+    description: 'The comma seperated list of runner labels for GitHub when stopping'
+    required: false
+  instance_mapping:
+    description: 'A JSON object mapping instance ids to unique GH runner labels'
+    required: false
+  aws_instance_ids:
+    description: 'The comma seperated list of ids for AWS when stopping'
+  aws_image_id:
+    description: "The machine AMI to use for your runner"
+    required: false
+  aws_instance_type:
+    description: "The type of instance to use for your runner"
+    required: false
+  aws_subnet_id:
+    description: "The AWS subnet ID to use for your runner"
+    required: false
+  aws_security_group_id:
+    description: "The AWS security group ID to use for your runner"
+    required: false
+  aws_iam_role:
+    description: "The AWS IAM role to use for your runner"
+    required: false
+  aws_tags:
+    description: "The AWS tags to use for your runner"
+    required: false
+  aws_region_name:
+    description: "The AWS region name to use for your runner"
+    required: false
+  aws_home_dir:
+    description: "The AWS AMI home directory to use for your runner"
+    required: false
+  aws_labels:
+    description: "The AWS labels to use for your runner"
+    required: false
+outputs:
+  mapping:
+    description: "A JSON object mapping instance ids to unique GH runner labels"
+
