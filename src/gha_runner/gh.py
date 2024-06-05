@@ -101,11 +101,8 @@ class GitHubInstance:
         """
         tokens = []
         for _ in range(count):
-            try:
-                token = self.create_runner_token()
-                tokens.append(token)
-            except TokenRetrievalError as e:
-                raise TokenRetrievalError(f"Error creating runner tokens: {e}")
+            token = self.create_runner_token()
+            tokens.append(token)
         return tokens
 
     def create_runner_token(self) -> str:
