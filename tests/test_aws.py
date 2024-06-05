@@ -21,12 +21,12 @@ def aws(aws_credentials):
         params = {
             "image_id": "ami-0772db4c976d21e9b",
             "instance_type": "t2.micro",
-            "tags": [],
+            # "tags": {},
             "region_name": "us-east-1",
             # "gh_runner_token": "testing",
             "gh_runner_tokens": ["testing"],
             "home_dir": "/home/ec2-user",
-            "runner_release": "",
+            "runner_release": "testing",
             "repo": "omsf-eco-infra/awsinfratesting",
         }
         yield AWS(**params)
@@ -36,7 +36,10 @@ def test_build_aws_params():
     params = {
         "image_id": "ami-0772db4c976d21e9b",
         "instance_type": "t2.micro",
-        "tags": [],
+        "tags": [
+            {"Key": "Name", "Value": "test"},
+            {"Key": "Owner", "Value": "test"},
+        ],
         "region_name": "us-east-1",
         "gh_runner_tokens": ["testing"],
         "home_dir": "/home/ec2-user",
@@ -64,7 +67,6 @@ def test_build_aws_params():
         "SubnetId": "test",
         "SecurityGroupIds": ["test"],
         "IamInstanceProfile": {"Name": "test"},
-        "TagSpecifications": [],
         "UserData": """#!/bin/bash
 cd "/home/ec2-user"
 echo "echo 'Hello, World!'" > pre-runner-script.sh
@@ -76,6 +78,15 @@ tar xzf runner.tar.gz
 ./config.sh --url https://github.com/omsf-eco-infra/awsinfratesting --token test --labels label --ephemeral
 ./run.sh
 """,
+        "TagSpecifications": [
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {"Key": "Name", "Value": "test"},
+                    {"Key": "Owner", "Value": "test"},
+                ],
+            }
+        ],
     }
 
 
@@ -84,9 +95,26 @@ def test_create_instances(aws):
     assert len(ids) == 1
 
 
+def test_create_instances_missing_release(aws):
+    aws.runner_release = ""
+    with pytest.raises(
+        ValueError, match="No runner release provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
+def test_create_instances_missing_tokens(aws):
+    aws.gh_runner_tokens = []
+    with pytest.raises(
+        ValueError, match="No GitHub runner tokens provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
 def test_instance_running(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
+    ids = list(ids.keys())
     assert aws.instance_running(ids[0])
 
 
@@ -100,6 +128,7 @@ def test_instance_running_dne(aws):
 def test_instance_running_terminated(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
+    ids = list(ids.keys())
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
@@ -110,6 +139,7 @@ def test_wait_until_ready(aws):
         "MaxAttempts": 1,
         "Delay": 5,
     }
+    ids = list(ids.keys())
     aws.wait_until_ready(ids, **params)
     assert aws.instance_running(ids[0])
 
@@ -136,6 +166,7 @@ def test_wait_until_ready_dne_long(aws):
 def test_remove_instances(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
+    ids = list(ids.keys())
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
@@ -143,6 +174,7 @@ def test_remove_instances(aws):
 def test_wait_until_removed(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
+    ids = list(ids.keys())
     aws.remove_instances(ids)
     params = {
         "MaxAttempts": 1,
