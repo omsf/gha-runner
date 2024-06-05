@@ -21,10 +21,8 @@ class CloudDeployment(ABC):
 
         Returns
         -------
-        list[str]
-            A list of instance IDs.
-        list[str]
-            A list of GitHub runner labels.
+        dict[str, str]
+            A dictionary of instance IDs and their corresponding github runner labels.
         """
         raise NotImplementedError
 
