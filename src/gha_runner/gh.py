@@ -120,7 +120,7 @@ class GitHubInstance:
 
         Raises
         ------
-        TokenCreationError
+        TokenRetrievalError
             If there is an error generating the token.
 
         """
