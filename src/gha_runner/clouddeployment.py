@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from gha_runner.gh import GitHubInstance
 from dataclasses import dataclass, field
 import importlib.resources
-from typing import Tuple
 import boto3
 from string import Template
 
@@ -90,9 +89,9 @@ class AWS(CloudDeployment):
     instance_type: str
     home_dir: str
     repo: str
-    tags: list[dict[str, str]]
     region_name: str
     runner_release: str = ""
+    tags: list[dict[str, str]] = field(default_factory=list)
     gh_runner_tokens: list[str] = field(default_factory=list)
     labels: str = ""
     subnet_id: str = ""
@@ -121,7 +120,6 @@ class AWS(CloudDeployment):
             "InstanceType": self.instance_type,
             "MinCount": 1,
             "MaxCount": 1,
-            "TagSpecifications": self.tags,
             "UserData": self._build_user_data(**user_data_params),
         }
         if self.subnet_id != "":
@@ -130,6 +128,10 @@ class AWS(CloudDeployment):
             params["SecurityGroupIds"] = [self.security_group_id]
         if self.iam_role != "":
             params["IamInstanceProfile"] = {"Name": self.iam_role}
+        if len(self.tags) > 0:
+            specs = {"ResourceType": "instance", "Tags": self.tags}
+            params["TagSpecifications"] = [specs]
+
         return params
 
     def create_instances(self) -> dict[str, str]:

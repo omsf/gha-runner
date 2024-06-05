@@ -29,10 +29,12 @@ def parse_aws_params() -> dict:
     if iam_role is not None:
         params["iam_role"] = iam_role
     # TODO: These will be passed in as a list?
-    # tags = os.environ.get("INPUT_AWS_TAGS")
-    # if tags is not None:
-    #     params["tags"] = tags
-    params["tags"] = []
+    tags = os.environ.get("INPUT_AWS_TAGS")
+    if tags is not None:
+        if tags != "":
+            # We need to parse the tags as JSON, this is how the ec2 runner did it
+            parsed_tags = json.loads(tags)
+            params["tags"] = parsed_tags
     region_name = os.environ.get("INPUT_AWS_REGION_NAME")
     if region_name is not None:
         params["region_name"] = region_name
