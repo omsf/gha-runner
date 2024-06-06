@@ -1,14 +1,7 @@
 from gha_runner.clouddeployment import CloudDeploymentFactory
 from gha_runner.gh import GitHubInstance
-import sys
 import os
 import json
-
-# https://github.com/hukkin/tomli?tab=readme-ov-file#building-a-tomlitomllib-compatibility-layer
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 
 def env_parse_helper(
