@@ -5,6 +5,10 @@ inputs:
   repo:
     description: "The repo to run against"
     required: false
+  instance_count:
+    description: "The number of instances to create"
+    required: false
+    default: '1'
   gh_pat:
     description: "The GHA PAT"
     required: true

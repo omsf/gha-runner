@@ -58,7 +58,7 @@ def get_instance_mapping() -> dict[str, str]:
 
 
 def start_runner_instances(
-    provider: str, cloud_params: dict, gh: GitHubInstance
+    provider: str, cloud_params: dict, gh: GitHubInstance, count: int
 ):
     release = gh.get_latest_runner_release(platform="linux", architecture="x64")
     cloud_params["runner_release"] = release
@@ -66,7 +66,7 @@ def start_runner_instances(
     # Create a GitHub instance
     print("Creating GitHub Actions Runner")
     # We need to create a runner token first
-    runner_tokens = gh.create_runner_tokens(count=1)
+    runner_tokens = gh.create_runner_tokens(count)
     cloud_params["gh_runner_tokens"] = runner_tokens
     # We will also get the latest runner release
     cloud = CloudDeploymentFactory().get_provider(
@@ -132,6 +132,8 @@ def main():
         "token": os.environ["GH_PAT"],
     }
     repo = os.environ.get("INPUT_REPO")
+    # Instance count will default to 1 if not provided
+    instance_count = int(os.environ["INPUT_INSTANCE_COUNT"])
     if repo is not None:
         gha_params["repo"] = repo
     else:
@@ -141,7 +143,12 @@ def main():
     action = os.environ["INPUT_ACTION"]
     gh = GitHubInstance(**gha_params)
     if action == "start":
-        start_runner_instances(provider, cloud_params, gh)
+        start_runner_instances(
+            provider,
+            cloud_params,
+            gh,
+            instance_count,
+        )
     elif action == "stop":
         stop_runner_instances(provider, cloud_params, gh)
 
