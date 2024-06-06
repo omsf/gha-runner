@@ -120,7 +120,8 @@ def test_create_instances_missing_home_dir(aws):
 def test_create_instances_missing_tokens(aws):
     aws.gh_runner_tokens = []
     with pytest.raises(
-        ValueError, match="No GitHub runner tokens provided, cannot create instances."
+        ValueError,
+        match="No GitHub runner tokens provided, cannot create instances.",
     ):
         aws.create_instances()
 

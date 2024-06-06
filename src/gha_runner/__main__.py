@@ -11,7 +11,9 @@ else:
     import tomli as tomllib
 
 
-def env_parse_helper(params: dict, var: str, key: str, is_json: bool = False) -> dict:
+def env_parse_helper(
+    params: dict, var: str, key: str, is_json: bool = False
+) -> dict:
     val = os.environ.get(var)
     if val is not None:
         if val != "":
@@ -49,11 +51,15 @@ def parse_aws_params() -> dict:
 def get_instance_mapping() -> dict[str, str]:
     mapping_str = os.environ.get("INPUT_INSTANCE_MAPPING")
     if mapping_str is None:
-        raise ValueError("Missing required input variable INPUT_INSTANCE_MAPPING")
+        raise ValueError(
+            "Missing required input variable INPUT_INSTANCE_MAPPING"
+        )
     return json.loads(mapping_str)
 
 
-def start_runner_instances(provider: str, cloud_params: dict, gh: GitHubInstance):
+def start_runner_instances(
+    provider: str, cloud_params: dict, gh: GitHubInstance
+):
     release = gh.get_latest_runner_release(platform="linux", architecture="x64")
     cloud_params["runner_release"] = release
     print("Starting up...")
@@ -80,7 +86,9 @@ def start_runner_instances(provider: str, cloud_params: dict, gh: GitHubInstance
         gh.wait_for_runner(label)
 
 
-def stop_runner_instances(provider: str, cloud_params: dict, gh: GitHubInstance):
+def stop_runner_instances(
+    provider: str, cloud_params: dict, gh: GitHubInstance
+):
     print("Shutting down...")
     try:
         mappings = get_instance_mapping()

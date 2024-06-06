@@ -30,3 +30,10 @@ exclude_also = ["raise NotImplementedError"]
 
 [tool.pytest.ini_options]
 markers = ["slow: marks test as slow"]
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = ["F", "E", "N"]
+

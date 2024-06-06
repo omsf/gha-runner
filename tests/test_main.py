@@ -10,7 +10,9 @@ def test_env_parse_helper():
     base: dict[str, str] = {}
     assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == base
     os.environ["TEST_ENV_VAR_GHA_RUNNER"] = "test"
-    assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == {"test": "test"}
+    assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == {
+        "test": "test"
+    }
 
 
 def test_parse_aws_params():
