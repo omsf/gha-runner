@@ -157,7 +157,7 @@ class AWS(CloudDeployment):
                 labels = label
             else:
                 labels = self.labels + "," + label
-            userDataParams = {
+            user_data_params = {
                 "token": token,
                 "repo": self.repo,
                 "homedir": self.home_dir,
@@ -165,7 +165,7 @@ class AWS(CloudDeployment):
                 "runner_release": self.runner_release,
                 "labels": labels,
             }
-            params = self._build_aws_params(userDataParams)
+            params = self._build_aws_params(user_data_params)
             result = ec2.run_instances(**params)
             instances = result["Instances"]
             id = instances[0]["InstanceId"]

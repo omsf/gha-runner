@@ -158,12 +158,12 @@ class GitHubInstance:
 
         """
         runners = self.github.get_repo(self.repo).get_self_hosted_runners()
-        matchedRunners = [
+        matched_runners = [
             runner
             for runner in runners
             if label in [l["name"] for l in runner.labels()]
         ]
-        return matchedRunners[0] if matchedRunners else None
+        return matched_runners[0] if matched_runners else None
 
     def get_runners(self, label: str) -> list[SelfHostedActionsRunner] | None:
         """Get runners by their label.
