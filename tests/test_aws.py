@@ -90,6 +90,12 @@ tar xzf runner.tar.gz
     }
 
 
+def test_create_instance_with_labels(aws):
+    aws.labels = "test"
+    ids = aws.create_instances()
+    assert len(ids) == 1
+
+
 def test_create_instances(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
