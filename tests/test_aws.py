@@ -103,10 +103,34 @@ def test_create_instances_missing_release(aws):
         aws.create_instances()
 
 
+def test_create_instances_missing_home_dir(aws):
+    aws.home_dir = ""
+    with pytest.raises(
+        ValueError, match="No home directory provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
 def test_create_instances_missing_tokens(aws):
     aws.gh_runner_tokens = []
     with pytest.raises(
         ValueError, match="No GitHub runner tokens provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
+def test_create_instances_missing_image_id(aws):
+    aws.image_id = ""
+    with pytest.raises(
+        ValueError, match="No image ID provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
+def test_create_instances_missing_instance_type(aws):
+    aws.instance_type = ""
+    with pytest.raises(
+        ValueError, match="No instance type provided, cannot create instances."
     ):
         aws.create_instances()
 

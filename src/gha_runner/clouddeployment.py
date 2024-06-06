@@ -141,6 +141,12 @@ class AWS(CloudDeployment):
             )
         if not self.runner_release:
             raise ValueError("No runner release provided, cannot create instances.")
+        if not self.home_dir:
+            raise ValueError("No home directory provided, cannot create instances.")
+        if not self.image_id:
+            raise ValueError("No image ID provided, cannot create instances.")
+        if not self.instance_type:
+            raise ValueError("No instance type provided, cannot create instances.")
         ec2 = boto3.client("ec2", region_name=self.region_name)
         id_dict = {}
         for token in self.gh_runner_tokens:

@@ -11,6 +11,17 @@ else:
     import tomli as tomllib
 
 
+def env_parse_helper(params: dict, var: str, key: str, is_json: bool = False) -> dict:
+    val = os.environ.get(var)
+    if val is not None:
+        if val != "":
+            if is_json:
+                params[key] = json.loads(val)
+            else:
+                params[key] = val
+    return params
+
+
 def parse_aws_params() -> dict:
     params = {}
     ami = os.environ.get("INPUT_AWS_IMAGE_ID")
@@ -19,31 +30,19 @@ def parse_aws_params() -> dict:
     instance_type = os.environ.get("INPUT_AWS_INSTANCE_TYPE")
     if instance_type is not None:
         params["instance_type"] = instance_type
-    subnet_id = os.environ.get("INPUT_AWS_SUBNET_ID")
-    if subnet_id is not None:
-        params["subnet_id"] = subnet_id
-    security_group_id = os.environ.get("INPUT_AWS_SECURITY_GROUP_ID")
-    if security_group_id is not None:
-        params["security_group_id"] = security_group_id
-    iam_role = os.environ.get("INPUT_AWS_IAM_ROLE")
-    if iam_role is not None:
-        params["iam_role"] = iam_role
-    # TODO: These will be passed in as a list?
-    tags = os.environ.get("INPUT_AWS_TAGS")
-    if tags is not None:
-        if tags != "":
-            # We need to parse the tags as JSON, this is how the ec2 runner did it
-            parsed_tags = json.loads(tags)
-            params["tags"] = parsed_tags
+    params = env_parse_helper(params, "INPUT_AWS_SUBNET_ID", "subnet_id")
+    params = env_parse_helper(
+        params, "INPUT_AWS_SECURITY_GROUP_ID", "security_group_id"
+    )
+    params = env_parse_helper(params, "INPUT_AWS_IAM_ROLE", "iam_role")
+    params = env_parse_helper(params, "INPUT_AWS_TAGS", "tags", is_json=True)
     region_name = os.environ.get("INPUT_AWS_REGION_NAME")
     if region_name is not None:
         params["region_name"] = region_name
     home_dir = os.environ.get("INPUT_AWS_HOME_DIR")
     if home_dir is not None:
         params["home_dir"] = home_dir
-    labels = os.environ.get("INPUT_AWS_LABELS")
-    if labels is not None:
-        params["labels"] = labels
+    params = env_parse_helper(params, "INPUT_AWS_LABELS", "labels")
     return params
 
 
