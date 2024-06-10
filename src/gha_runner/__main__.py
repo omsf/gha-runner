@@ -74,8 +74,8 @@ def start_runner_instances(
     print("Waiting for instance to be ready...")
     cloud.wait_until_ready(instance_ids)
     print("Instance is ready!")
-    # gh.wait_for_runner("testing")
     for label in github_labels:
+        print(f"Waiting for {label}...")
         gh.wait_for_runner(label)
 
 
