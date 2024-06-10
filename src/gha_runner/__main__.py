@@ -4,7 +4,7 @@ import os
 import json
 
 
-def env_parse_helper(
+def _env_parse_helper(
     params: dict, var: str, key: str, is_json: bool = False
 ) -> dict:
     val = os.environ.get(var)
@@ -25,19 +25,19 @@ def parse_aws_params() -> dict:
     instance_type = os.environ.get("INPUT_AWS_INSTANCE_TYPE")
     if instance_type is not None:
         params["instance_type"] = instance_type
-    params = env_parse_helper(params, "INPUT_AWS_SUBNET_ID", "subnet_id")
-    params = env_parse_helper(
+    params = _env_parse_helper(params, "INPUT_AWS_SUBNET_ID", "subnet_id")
+    params = _env_parse_helper(
         params, "INPUT_AWS_SECURITY_GROUP_ID", "security_group_id"
     )
-    params = env_parse_helper(params, "INPUT_AWS_IAM_ROLE", "iam_role")
-    params = env_parse_helper(params, "INPUT_AWS_TAGS", "tags", is_json=True)
+    params = _env_parse_helper(params, "INPUT_AWS_IAM_ROLE", "iam_role")
+    params = _env_parse_helper(params, "INPUT_AWS_TAGS", "tags", is_json=True)
     region_name = os.environ.get("INPUT_AWS_REGION_NAME")
     if region_name is not None:
         params["region_name"] = region_name
     home_dir = os.environ.get("INPUT_AWS_HOME_DIR")
     if home_dir is not None:
         params["home_dir"] = home_dir
-    params = env_parse_helper(params, "INPUT_AWS_LABELS", "labels")
+    params = _env_parse_helper(params, "INPUT_AWS_LABELS", "labels")
     return params
 
 
