@@ -87,7 +87,7 @@ jobs:
           repo: "testing/testing"
           provider: "aws"
           action: "start"
-          aws_image_id: ami-0772db4c976d21e9b
+          aws_image_id: <use an image here that has docker installed>
           aws_instance_type: t2.micro
           instance_count: 2
           aws_region_name: us-east-1
