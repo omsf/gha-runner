@@ -104,7 +104,7 @@ def stop_runner_instances(
     print("Instances removed!")
 
 
-def main():
+def main():  # pragma: no cover
     """
     Main entrypoint for the application. As of right now, this is just a test.
     Requires the following environment variables:
