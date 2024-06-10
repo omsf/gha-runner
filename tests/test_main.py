@@ -8,7 +8,7 @@ from gha_runner.__main__ import (
 
 def test_env_parse_helper():
     base: dict[str, str] = {}
-    assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == base
+    assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == {}
     os.environ["TEST_ENV_VAR_GHA_RUNNER"] = "test"
     assert env_parse_helper(base, "TEST_ENV_VAR_GHA_RUNNER", "test") == {
         "test": "test"
