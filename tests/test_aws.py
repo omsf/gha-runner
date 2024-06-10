@@ -145,7 +145,7 @@ def test_create_instances_missing_instance_type(aws):
 def test_instance_running(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
-    ids = list(ids.keys())
+    ids = list(ids)
     assert aws.instance_running(ids[0])
 
 
@@ -159,7 +159,7 @@ def test_instance_running_dne(aws):
 def test_instance_running_terminated(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
-    ids = list(ids.keys())
+    ids = list(ids)
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
@@ -170,7 +170,7 @@ def test_wait_until_ready(aws):
         "MaxAttempts": 1,
         "Delay": 5,
     }
-    ids = list(ids.keys())
+    ids = list(ids)
     aws.wait_until_ready(ids, **params)
     assert aws.instance_running(ids[0])
 
@@ -197,7 +197,7 @@ def test_wait_until_ready_dne_long(aws):
 def test_remove_instances(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
-    ids = list(ids.keys())
+    ids = list(ids)
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
 
@@ -205,7 +205,7 @@ def test_remove_instances(aws):
 def test_wait_until_removed(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
-    ids = list(ids.keys())
+    ids = list(ids)
     aws.remove_instances(ids)
     params = {
         "MaxAttempts": 1,
