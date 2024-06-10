@@ -37,7 +37,7 @@ def parse_aws_params() -> dict:
     home_dir = os.environ.get("INPUT_AWS_HOME_DIR")
     if home_dir is not None:
         params["home_dir"] = home_dir
-    params = _env_parse_helper(params, "INPUT_AWS_LABELS", "labels")
+    params = _env_parse_helper(params, "INPUT_EXTRA_GH_LABELS", "labels")
     return params
 
 
