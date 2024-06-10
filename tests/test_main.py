@@ -51,7 +51,7 @@ def test_env_parse_helper():
             {"INPUT_AWS_HOME_DIR": "/home/ec2-user"},
             [{"home_dir": "/home/ec2-user"}],
         ),
-        ({"INPUT_AWS_LABELS": "test"}, [{"labels": "test"}]),
+        ({"INPUT_EXTRA_GH_LABELS": "test"}, [{"labels": "test"}]),
         (
             {"INPUT_AWS_IMAGE_ID": "ami-1234567890"},
             [{"image_id": "ami-1234567890"}],
