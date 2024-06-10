@@ -8,12 +8,11 @@ def _env_parse_helper(
     params: dict, var: str, key: str, is_json: bool = False
 ) -> dict:
     val = os.environ.get(var)
-    if val is not None:
-        if val != "":
-            if is_json:
-                params[key] = json.loads(val)
-            else:
-                params[key] = val
+    if val is not None and val != "":
+        if is_json:
+            params[key] = json.loads(val)
+        else:
+            params[key] = val
     return params
 
 
