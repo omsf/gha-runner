@@ -86,8 +86,10 @@ def stop_runner_instances(
     try:
         mappings = get_instance_mapping()
     except Exception as e:
-        print(e)
-        return
+        # This format is the native format for GitHub Actions
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
+        print(f"::error title=Malformed instance mapping::{e}")
+        exit(1)
     print("Removing GitHub Actions Runner")
     instance_ids = list(mappings.keys())
     labels = list(mappings.values())
