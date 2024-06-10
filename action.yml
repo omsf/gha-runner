@@ -51,5 +51,4 @@ inputs:
     required: false
 outputs:
   mapping:
-    description: "A JSON object mapping instance ids to unique GH runner labels"
-
+    description: "A JSON object mapping instance IDs to unique GitHub runner labels. This is used in conjection with the the `instance_mapping` input when stopping."
