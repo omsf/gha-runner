@@ -29,7 +29,7 @@ gha_runner = ["*.templ", "templates/*.templ"]
 exclude_also = ["raise NotImplementedError"]
 
 [tool.pytest.ini_options]
-markers = ["slow: marks test as slow"]
+markers = ["slow: marks test as slow","main: marks the test for the main module"]
 
 [tool.ruff]
 line-length = 80
