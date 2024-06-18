@@ -122,7 +122,9 @@ class GitHubInstance:
 
         """
         try:
-            res = self.post(f"repos/{self.repo}/actions/runners/registration-token")
+            res = self.post(
+                f"repos/{self.repo}/actions/runners/registration-token"
+            )
             return res["token"]
         except Exception as e:
             raise TokenRetrievalError(f"Error creating runner token: {e}")
@@ -158,12 +160,12 @@ class GitHubInstance:
 
         """
         runners = self.github.get_repo(self.repo).get_self_hosted_runners()
-        matchedRunners = [
+        matched_runners = [
             runner
             for runner in runners
             if label in [l["name"] for l in runner.labels()]
         ]
-        return matchedRunners[0] if matchedRunners else None
+        return matched_runners[0] if matched_runners else None
 
     def get_runners(self, label: str) -> list[SelfHostedActionsRunner] | None:
         """Get runners by their label.
@@ -218,7 +220,9 @@ class GitHubInstance:
         """
         runner = self.get_runner(label)
         if runner is not None:
-            removed = self.github.get_repo(self.repo).remove_self_hosted_runner(runner)
+            removed = self.github.get_repo(self.repo).remove_self_hosted_runner(
+                runner
+            )
             if not removed:
                 raise RuntimeError(f"Error removing runner {label}")
         else:
@@ -241,9 +245,9 @@ class GitHubInstance:
         runners = self.get_runners(label)
         if runners is not None:
             for runner in runners:
-                removed = self.github.get_repo(self.repo).remove_self_hosted_runner(
-                    runner
-                )
+                removed = self.github.get_repo(
+                    self.repo
+                ).remove_self_hosted_runner(runner)
                 if not removed:
                     raise RuntimeError(f"Error removing runner {label}")
         else:
@@ -265,7 +269,9 @@ class GitHubInstance:
         result_str = "".join(random.choice(letters) for i in range(8))
         return f"runner-{result_str}"
 
-    def get_latest_runner_release(self, platform: str, architecture: str) -> str:
+    def get_latest_runner_release(
+        self, platform: str, architecture: str
+    ) -> str:
         """Return the latest runner for the given platform and architecture.
 
         Parameters
@@ -292,4 +298,6 @@ class GitHubInstance:
         for asset in assets:
             if platform in asset.name and architecture in asset.name:
                 return asset.browser_download_url
-        raise RuntimeError(f"Runner not found for {platform} and {architecture}")
+        raise RuntimeError(
+            f"Runner not found for {platform} and {architecture}"
+        )

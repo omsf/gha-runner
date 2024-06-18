@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from gha_runner.gh import GitHubInstance
+from dataclasses import dataclass, field
 import importlib.resources
 import boto3
 from string import Template
@@ -13,15 +14,14 @@ class CloudDeployment(ABC):
     """
 
     @abstractmethod
-    def create_instances(self) -> list[str]:
+    def create_instances(self) -> dict[str, str]:
         """Create instances in the cloud provider and return their IDs.
         The number of instances to create is defined by the implementation.
 
         Returns
         -------
-        list[str]
-            A list of instance IDs.
-
+        dict[str, str]
+            A dictionary of instance IDs and their corresponding github runner labels.
         """
         raise NotImplementedError
 
@@ -87,12 +87,12 @@ class CloudDeployment(ABC):
 class AWS(CloudDeployment):
     image_id: str
     instance_type: str
-    gh_runner_tokens: list[str]
     home_dir: str
     repo: str
-    tags: list[dict[str, str]]
     region_name: str
-    runner_release: str
+    runner_release: str = ""
+    tags: list[dict[str, str]] = field(default_factory=list)
+    gh_runner_tokens: list[str] = field(default_factory=list)
     labels: str = ""
     subnet_id: str = ""
     security_group_id: str = ""
@@ -120,7 +120,6 @@ class AWS(CloudDeployment):
             "InstanceType": self.instance_type,
             "MinCount": 1,
             "MaxCount": 1,
-            "TagSpecifications": self.tags,
             "UserData": self._build_user_data(**user_data_params),
         }
         if self.subnet_id != "":
@@ -129,25 +128,56 @@ class AWS(CloudDeployment):
             params["SecurityGroupIds"] = [self.security_group_id]
         if self.iam_role != "":
             params["IamInstanceProfile"] = {"Name": self.iam_role}
+        if len(self.tags) > 0:
+            specs = {"ResourceType": "instance", "Tags": self.tags}
+            params["TagSpecifications"] = [specs]
+
         return params
 
-    def create_instances(self) -> list[str]:
+    def create_instances(self) -> dict[str, str]:
+        if not self.gh_runner_tokens:
+            raise ValueError(
+                "No GitHub runner tokens provided, cannot create instances."
+            )
+        if not self.runner_release:
+            raise ValueError(
+                "No runner release provided, cannot create instances."
+            )
+        if not self.home_dir:
+            raise ValueError(
+                "No home directory provided, cannot create instances."
+            )
+        if not self.image_id:
+            raise ValueError("No image ID provided, cannot create instances.")
+        if not self.instance_type:
+            raise ValueError(
+                "No instance type provided, cannot create instances."
+            )
         ec2 = boto3.client("ec2", region_name=self.region_name)
-        ids = []
+        id_dict = {}
         for token in self.gh_runner_tokens:
-            userDataParams = {
+            label = GitHubInstance.generate_random_label()
+            # unique_labels.append(label)
+            labels = self.labels
+            if labels == "":
+                labels = label
+            else:
+                labels = self.labels + "," + label
+            user_data_params = {
                 "token": token,
                 "repo": self.repo,
                 "homedir": self.home_dir,
                 "script": self.script,
                 "runner_release": self.runner_release,
-                "labels": self.labels,
+                "labels": labels,
             }
-            params = self._build_aws_params(userDataParams)
+            params = self._build_aws_params(user_data_params)
             result = ec2.run_instances(**params)
             instances = result["Instances"]
-            ids += [instance["InstanceId"] for instance in instances]
-        return ids
+            id = instances[0]["InstanceId"]
+            id_dict[id] = label
+            # ids += [instance["InstanceId"] for instance in instances]
+        return id_dict
 
     def remove_instances(self, ids: list[str]):
         ec2 = boto3.client("ec2", self.region_name)

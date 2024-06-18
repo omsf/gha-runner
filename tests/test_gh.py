@@ -49,7 +49,13 @@ def github_release_mock():
             None,
         ),
         # Test case where the latest release does not exist
-        ("darwin", "x64", None, RuntimeError, "Runner not found for darwin and x64"),
+        (
+            "darwin",
+            "x64",
+            None,
+            RuntimeError,
+            "Runner not found for darwin and x64",
+        ),
     ],
 )
 def test_get_latest_runner_release(
@@ -93,7 +99,11 @@ def test_get_runners(github_release_mock):
     "label, error, match",
     [
         ("runner-linux-x64", None, None),
-        ("runner-darwin-x64", RuntimeError, "Runner runner-darwin-x64 not found"),
+        (
+            "runner-darwin-x64",
+            RuntimeError,
+            "Runner runner-darwin-x64 not found",
+        ),
     ],
 )
 def test_remove_runners(github_release_mock, label, error, match):
@@ -109,7 +119,9 @@ def test_remove_runners(github_release_mock, label, error, match):
 def test_remove_runners_fail(github_release_mock):
     instance, _, mock_repo = github_release_mock
     mock_repo.remove_self_hosted_runner.return_value = False
-    with pytest.raises(RuntimeError, match="Error removing runner runner-linux-x64"):
+    with pytest.raises(
+        RuntimeError, match="Error removing runner runner-linux-x64"
+    ):
         instance.remove_runners("runner-linux-x64")
 
 
@@ -117,8 +129,16 @@ def test_remove_runners_fail(github_release_mock):
     "label, error, match",
     [
         ("runner-linux-x64", None, None),
-        ("runner-linux-x64", RuntimeError, "Error removing runner runner-linux-x64"),
-        ("non-existent-runner", RuntimeError, "Runner non-existent-runner not found"),
+        (
+            "runner-linux-x64",
+            RuntimeError,
+            "Error removing runner runner-linux-x64",
+        ),
+        (
+            "non-existent-runner",
+            RuntimeError,
+            "Runner non-existent-runner not found",
+        ),
     ],
 )
 def test_remove_runner(github_release_mock, label, error, match):
@@ -156,7 +176,9 @@ def test_headers(github_release_mock):
         ),
     ],
 )
-def test_do_request(github_release_mock, status_code, ok, content, error, match):
+def test_do_request(
+    github_release_mock, status_code, ok, content, error, match
+):
     import requests
 
     instance, _, _ = github_release_mock
@@ -304,7 +326,9 @@ def post_fixture_multi_fail(monkeypatch):
     return mock, responses
 
 
-def test_create_github_runners_exception(github_release_mock, post_fixture_multi_fail):
+def test_create_github_runners_exception(
+    github_release_mock, post_fixture_multi_fail
+):
     instance, _, _ = github_release_mock
     json_mock, responses = post_fixture_multi_fail
     count = len(responses)
@@ -327,7 +351,9 @@ def mock_get_runner(monkeypatch):
     missing_str = f"Runner {label} not found. Waiting...\n"
     found_str = f"Runner {label} found!\n"
     # Dynamically build out the expected calls based on the side_effect
-    expected_calls = [missing_str if x is None else found_str for x in side_effect]
+    expected_calls = [
+        missing_str if x is None else found_str for x in side_effect
+    ]
 
     get_runner_mock = MagicMock()
     # Setup the side_effect for the get_runner_mock
