@@ -1,4 +1,5 @@
 name: gha-runner
+description: A simple GitHub Action for creating self-hosted runners.
 runs:
   using: 'docker'
   image: 'Dockerfile'
