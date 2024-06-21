@@ -303,7 +303,7 @@ class GitHubInstance:
             )
         if architecture not in supported_platforms[platform]:
             raise ValueError(
-                f"Architecture {architecture} not supported for platform {platform}."
+                f"Architecture {architecture} not supported for platform {platform}. "
                 f"Supported architectures are {supported_platforms[platform]}"
             )
         release = self.github.get_repo(repo).get_latest_release()
