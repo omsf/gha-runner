@@ -49,7 +49,7 @@ def github_release_mock():
             None,
             None,
         ),
-        # Test case where the latest release does not exist
+        # Test case where the platform is not supported
         (
             "darwin",
             "x64",
