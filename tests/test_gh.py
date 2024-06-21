@@ -1,3 +1,4 @@
+import re
 import pytest
 from unittest.mock import patch, MagicMock, Mock
 
@@ -53,8 +54,16 @@ def github_release_mock():
             "darwin",
             "x64",
             None,
-            RuntimeError,
-            "Runner not found for darwin and x64",
+            ValueError,
+            "Platform darwin not supported. Supported platforms are dict_keys(['linux'])",
+        ),
+        # Test case where the architecture is not supported
+        (
+            "linux",
+            "armv7",
+            None,
+            ValueError,
+            "Architecture armv7 not supported for platform linux. Supported architectures are ['x64', 'arm', 'arm64']",
         ),
     ],
 )
@@ -63,7 +72,8 @@ def test_get_latest_runner_release(
 ):
     instance, _, _ = github_release_mock
     if raises:
-        with pytest.raises(raises, match=match_msg):
+        msg = re.escape(match_msg)
+        with pytest.raises(raises, match=msg):
             instance.get_latest_runner_release(platform, architecture)
     else:
         result = instance.get_latest_runner_release(platform, architecture)
