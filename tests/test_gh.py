@@ -65,6 +65,14 @@ def github_release_mock():
             ValueError,
             "Architecture armv7 not supported for platform linux. Supported architectures are ['x64', 'arm', 'arm64']",
         ),
+        # Test case where the latest release does not exist
+        (
+            "linux",
+            "arm",
+            None,
+            RuntimeError,
+            "Runner release not found for platform linux and architecture arm",
+        ),
     ],
 )
 def test_get_latest_runner_release(

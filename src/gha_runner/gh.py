@@ -312,5 +312,5 @@ class GitHubInstance:
             if platform in asset.name and architecture in asset.name:
                 return asset.browser_download_url
         raise RuntimeError(
-            f"Runner not found for {platform} and {architecture}"
+            f"Runner release not found for platform {platform} and architecture {architecture}"
         )
