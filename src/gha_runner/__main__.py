@@ -126,12 +126,14 @@ def main():  # pragma: no cover
         "token": os.environ["GH_PAT"],
     }
     repo = os.environ.get("INPUT_REPO")
-    # Instance count will default to 1 if not provided
-    instance_count = int(os.environ["INPUT_INSTANCE_COUNT"])
-    if repo is not None:
+    if repo is None or repo == "":
+        repo = os.environ.get("GITHUB_REPOSITORY")
+    # We check again to validate that this was set correctly
+    if repo is not None or repo == "":
         gha_params["repo"] = repo
     else:
-        gha_params["repo"] = os.environ["GITHUB_REPOSITORY"]
+        raise Exception("Repo key is missing or GITHUB_REPOSITORY is missing")
+    instance_count = int(os.environ["INPUT_INSTANCE_COUNT"])
     cloud_params = parse_aws_params()
     cloud_params["repo"] = gha_params["repo"]
     action = os.environ["INPUT_ACTION"]
