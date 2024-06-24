@@ -298,8 +298,8 @@ class GitHubInstance:
         supported_platforms = {"linux": ["x64", "arm", "arm64"]}
         if platform not in supported_platforms:
             raise ValueError(
-                f"Platform {platform} not supported. "
-                f"Supported platforms are {supported_platforms.keys()}"
+                f"Platform '{platform}' not supported. "
+                f"Supported platforms are {list(supported_platforms)}"
             )
         if architecture not in supported_platforms[platform]:
             raise ValueError(
