@@ -55,7 +55,7 @@ def github_release_mock():
             "x64",
             None,
             ValueError,
-            "Platform darwin not supported. Supported platforms are dict_keys(['linux'])",
+            "Platform 'darwin' not supported. Supported platforms are ['linux']",
         ),
         # Test case where the architecture is not supported
         (
@@ -63,7 +63,7 @@ def github_release_mock():
             "armv7",
             None,
             ValueError,
-            "Architecture armv7 not supported for platform linux. Supported architectures are ['x64', 'arm', 'arm64']",
+            "Architecture 'armv7' not supported for platform 'linux'. Supported architectures are ['x64', 'arm', 'arm64']",
         ),
         # Test case where the latest release does not exist
         (
