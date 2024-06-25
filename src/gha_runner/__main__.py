@@ -1,5 +1,5 @@
 from gha_runner.clouddeployment import CloudDeploymentFactory
-from gha_runner.gh import GitHubInstance
+from gha_runner.gh import GitHubInstance, MissingRunnerLabel
 import os
 import json
 
@@ -93,8 +93,19 @@ def stop_runner_instances(
     instance_ids = list(mappings.keys())
     labels = list(mappings.values())
     for label in labels:
-        print(f"Removing runner {label}")
-        gh.remove_runner(label)
+        try:
+            print(f"Removing runner {label}")
+            gh.remove_runner(label)
+        # This occurs when we have a runner that might already be shutdown.
+        # Since we are mainly using the ephemeral runners, we expect this to happen
+        except MissingRunnerLabel:
+            print(f"Runner {label} does not exist, skipping...")
+            continue
+        # This is more of the case when we have a failure to remove the runner
+        # This is not a concern for the user (because we will remove the instance anyways),
+        # but we should log it for debugging purposes.
+        except Exception as e:
+            print(f"::warning title=Failed to remove runner::{e}")
     cloud = CloudDeploymentFactory().get_provider(
         provider_name=provider, **cloud_params
     )

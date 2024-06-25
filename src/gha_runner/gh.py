@@ -12,6 +12,9 @@ import string
 class TokenRetrievalError(Exception):
     """Exception raised when there is an error retrieving a token from GitHub."""
 
+class MissingRunnerLabel(Exception):
+    """Exception raised when a runner does not exist in the repository."""
+
 
 class GitHubInstance:
     """Class to manage GitHub repository actions through the GitHub API.
@@ -226,7 +229,7 @@ class GitHubInstance:
             if not removed:
                 raise RuntimeError(f"Error removing runner {label}")
         else:
-            raise RuntimeError(f"Runner {label} not found")
+            raise MissingRunnerLabel(f"Runner {label} not found")
 
     def remove_runners(self, label: str):
         """Remove runners by their label.
@@ -251,7 +254,7 @@ class GitHubInstance:
                 if not removed:
                     raise RuntimeError(f"Error removing runner {label}")
         else:
-            raise RuntimeError(f"Runner {label} not found")
+            raise MissingRunnerLabel(f"Runner {label} not found")
 
     @staticmethod
     def generate_random_label() -> str:
