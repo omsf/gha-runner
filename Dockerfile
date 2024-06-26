@@ -1,8 +1,8 @@
 FROM python:3.10-slim
 
 ENV PYTHONUNBUFFERED=1
-WORKDIR /usr/src/app
-COPY . .
-RUN pip install --no-cache-dir .
+RUN mkdir app
+COPY . /app
+RUN pip install --no-cache-dir /app
 
-CMD [ "python", "src/gha_runner/" ]
+CMD [ "python", "/app/src/gha_runner/" ]
