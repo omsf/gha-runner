@@ -1,5 +1,5 @@
 # AWS Setup Instructions
-The goal of this document is to provide a guide on how to setup the GitHub Action runner on AWS. This document will guide you through the account setup required to use this action with AWS.
+The goal of this document is to provide a guide on how to set up the GitHub Action runner on AWS. This document will guide you through the account setup required to use this action with AWS.
 
 ## Prerequisites
 - An AWS account
