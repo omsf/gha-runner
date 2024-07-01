@@ -2,7 +2,7 @@ import re
 import pytest
 from unittest.mock import patch, MagicMock, Mock
 
-from gha_runner.gh import TokenRetrievalError, GitHubInstance
+from gha_runner.gh import TokenRetrievalError, GitHubInstance, MissingRunnerLabel
 from github.SelfHostedActionsRunner import SelfHostedActionsRunner
 
 
@@ -127,7 +127,7 @@ def test_get_runners(github_release_mock):
 def test_remove_runners(github_release_mock, label, error, match):
     instance, _, mock_repo = github_release_mock
     if error:
-        with pytest.raises(RuntimeError, match=match):
+        with pytest.raises(MissingRunnerLabel, match=match):
             instance.remove_runners(label)
     else:
         instance.remove_runners(label)
@@ -154,7 +154,7 @@ def test_remove_runners_fail(github_release_mock):
         ),
         (
             "non-existent-runner",
-            RuntimeError,
+            MissingRunnerLabel,
             "Runner non-existent-runner not found",
         ),
     ],
@@ -163,7 +163,7 @@ def test_remove_runner(github_release_mock, label, error, match):
     instance, _, mock_repo = github_release_mock
     if error:
         mock_repo.remove_self_hosted_runner.return_value = False
-        with pytest.raises(RuntimeError, match=match):
+        with pytest.raises(error, match=match):
             instance.remove_runner(label)
     else:
         instance.remove_runner(label)

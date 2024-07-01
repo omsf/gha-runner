@@ -1,5 +1,5 @@
 from gha_runner.clouddeployment import CloudDeploymentFactory
-from gha_runner.gh import GitHubInstance
+from gha_runner.gh import GitHubInstance, MissingRunnerLabel
 import os
 import json
 
@@ -93,8 +93,19 @@ def stop_runner_instances(
     instance_ids = list(mappings.keys())
     labels = list(mappings.values())
     for label in labels:
-        print(f"Removing runner {label}")
-        gh.remove_runner(label)
+        try:
+            print(f"Removing runner {label}")
+            gh.remove_runner(label)
+        # This occurs when we have a runner that might already be shutdown.
+        # Since we are mainly using the ephemeral runners, we expect this to happen
+        except MissingRunnerLabel:
+            print(f"Runner {label} does not exist, skipping...")
+            continue
+        # This is more of the case when we have a failure to remove the runner
+        # This is not a concern for the user (because we will remove the instance anyways),
+        # but we should log it for debugging purposes.
+        except Exception as e:
+            print(f"::warning title=Failed to remove runner::{e}")
     cloud = CloudDeploymentFactory().get_provider(
         provider_name=provider, **cloud_params
     )
@@ -126,12 +137,14 @@ def main():  # pragma: no cover
         "token": os.environ["GH_PAT"],
     }
     repo = os.environ.get("INPUT_REPO")
-    # Instance count will default to 1 if not provided
-    instance_count = int(os.environ["INPUT_INSTANCE_COUNT"])
-    if repo is not None:
+    if repo is None or repo == "":
+        repo = os.environ.get("GITHUB_REPOSITORY")
+    # We check again to validate that this was set correctly
+    if repo is not None or repo == "":
         gha_params["repo"] = repo
     else:
-        gha_params["repo"] = os.environ["GITHUB_REPOSITORY"]
+        raise Exception("Repo key is missing or GITHUB_REPOSITORY is missing")
+    instance_count = int(os.environ["INPUT_INSTANCE_COUNT"])
     cloud_params = parse_aws_params()
     cloud_params["repo"] = gha_params["repo"]
     action = os.environ["INPUT_ACTION"]
