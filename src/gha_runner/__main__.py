@@ -112,8 +112,17 @@ def stop_runner_instances(
     print("Removing instances...")
     cloud.remove_instances(instance_ids)
     print("Waiting for instance to be removed...")
-    cloud.wait_until_removed(instance_ids)
-    print("Instances removed!")
+    try:
+        cloud.wait_until_removed(instance_ids)
+        print("Instances removed!")
+    except Exception as e:
+        # Print to stdout
+        print(f"Failed to remove instances check AWS console: {e}")
+        # Print to Annotations
+        print(
+            f"::error title=Failed to remove instances check AWS console::{e}"
+        )
+        exit(1)
 
 
 def main():  # pragma: no cover
