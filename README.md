@@ -1,5 +1,5 @@
 # gha-runner
-A simple GitHub Action for creating self-hosted runners. Currently, this only supports AWS and x86_64 Linux AMIs. This runner is heavily inspired by [ec2-github-runner](https://github.com/machulav/ec2-github-runner) but rewritten for the molecular software community as well as changes to support additional cloud providers.
+A simple GitHub Action for creating self-hosted runners. Currently, this only supports AWS and x86_64 Linux AMIs. This runner is heavily inspired by [ec2-github-runner](https://github.com/machulav/ec2-github-runner) but rewritten to support additional cloud providers and to better meet some needs of the OMSF community.
 
 ## Inputs
 | Name | Description | Required | Default |
