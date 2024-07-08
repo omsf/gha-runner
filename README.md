@@ -1,5 +1,6 @@
 # gha-runner
-A simple GitHub Action for creating self-hosted runners. Currently, this only supports AWS and Linux AMIs.
+A simple GitHub Action for creating self-hosted runners. Currently, this only supports AWS and x86_64 Linux AMIs. This runner is heavily inspired by [ec2-github-runner](https://github.com/machulav/ec2-github-runner) but rewritten to support additional cloud providers and to better meet some needs of the OMSF community.
+
 
 ## Inputs
 
@@ -157,3 +158,6 @@ For testing on M-series Macs, use the following command instead:
 ```sh
 act --container-architecture linux/arm64 -W test-workflows/ --verbose
 ```
+
+## Acknowledgements
+This action was heavily inspired by the [ec2-github-runner](https://github.com/machulav/ec2-github-runner). This action takes much of its structure and inspiration around architecture from the `ec2-github-runner` itself. Thank you to the authors of that action for providing a solid foundation to build upon.
