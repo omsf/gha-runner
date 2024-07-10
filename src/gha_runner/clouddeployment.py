@@ -199,7 +199,6 @@ class AWS(CloudDeployment):
     def wait_until_removed(self, ids: list[str], **kwargs):
         ec2 = boto3.client("ec2", self.region_name)
         waiter = ec2.get_waiter("instance_terminated")
-        waiter_config = {"Delay": 15, "MaxAttempts": 80}
 
         if kwargs:
             waiter.wait(InstanceIds=ids, WaiterConfig=kwargs)
