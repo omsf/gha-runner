@@ -122,6 +122,23 @@ class MockCloudProvider:
         pass
 
 
+class FailedCloudProvider:
+    def __init__(self, **kwargs):
+        pass
+
+    def create_instances(self):
+        pass
+
+    def wait_until_ready(self, instance_ids):
+        pass
+
+    def remove_instances(self, instance_ids):
+        pass
+
+    def wait_until_removed(self, instance_ids):
+        raise Exception("Test")
+
+
 def mock_get_instance_mapping():
     return {"instance_id_1": "label_1"}
 
@@ -130,7 +147,10 @@ def mock_get_instance_mapping():
 def mock_cloud_deployment_factory():
     with patch.dict(
         "gha_runner.clouddeployment.CloudDeploymentFactory.providers",
-        {"mock_provider": MockCloudProvider},
+        {
+            "mock_provider": MockCloudProvider,
+            "failed_provider": FailedCloudProvider,
+        },
     ):
         yield
 
@@ -199,3 +219,18 @@ def test_stop_runner_instances_failure(
             assert (
                 captured.out == "::error title=Malformed instance mapping::Test"
             )
+
+
+def test_stop_runner_instances_aws(
+    mock_cloud_deployment_factory, mock_gh_output, mock_gh, capsys
+):
+    with patch(
+        "gha_runner.__main__.get_instance_mapping",
+        new=mock_get_instance_mapping,
+    ):
+        with pytest.raises(SystemExit) as fail:
+            stop_runner_instances(
+                provider="failed_provider", cloud_params={}, gh=mock_gh
+            )
+            assert fail.type == SystemExit
+            assert fail.value.code == 1
