@@ -50,24 +50,12 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
       - `AWS_ACCESS_KEY_ID` - The Access Key you copied earlier.
       - `AWS_SECRET_ACCESS_KEY` - The Secret Access Key you copied earlier.
       - `GITHUB_TOKEN` - The GitHub token you copied earlier.
-4. Prepare an EC2 image
-    1. Go to the AWS Management Console and sign in to your account.
-    2. Go to the EC2 console.
-    3. Click "Launch Instance".
-    4. Select an Amazon Linux 2 AMI.
-    5. Choose an instance type.
-    6. Configure the instance details.
-    7. Connect to the instance and install `docker`, `git`, and enable the `docker` service. This will be distro dependent.
-    8. Feel free to install any other useful tools that you may need to get started.
-    9. Create an image of the instance using the following [AWS Docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html) (this may take a while)
-    10. Make sure to remove the instance once you are done creating the image.
-5. Optional: Create a VPC with subnet and security group.
-    1. Go to the AWS Management Console and sign in to your account.
-    2. Go to the VPC console.
-    3. Create a VPC.
-    4. Create a subnet.
-    5. Create a security group. The security group should only require outbound traffic on port 443 to pull jobs from GitHub, no inbound traffic is required.
-    6. Attach the security group to the subnet.
+4. Choose an (or create) an AMI
+    - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
+    - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
+    - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
+
+**NOTE**: If you are already using AWS for EC2, you may consider creating a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html), [subnet](https://docs.aws.amazon.com/vpc/latest/userguide/create-subnets.html), and a [security group](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-groups.html) with outbound traffic on port 443 to isolate your runners from the rest of your AWS account.
 
 You are now ready to start using this action with AWS!
 
