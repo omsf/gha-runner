@@ -6,36 +6,34 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
 
 ## Setup
 1. Prepare an IAM user with AWS access keys
-    1. Go to the AWS Management Console and sign in to your account.
+    1. Sign in to your AWS Management Console.
     2. Go to the IAM console.
-    3. In the navigation pane, choose Policies.
-    4. Create a new policy by clicking "Create Policy".
-    5. Next, click JSON and paste the following JSON with the required permissions and then click "Next".
-      ```json
-    {
-      "Version": "2012-10-17",
-      "Statement": [
+    3. In the navigation pane, choose "Policies" and click "Create Policy".
+    4. Select the "JSON" tab, paste the following JSON, and click "Next":
+        ```json
         {
-          "Effect": "Allow",
-          "Action": [
-            "ec2:RunInstances",
-            "ec2:TerminateInstances",
-            "ec2:DescribeInstances",
-            "ec2:DescribeInstanceStatus"
-          ],
-          "Resource": "*"
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ec2:RunInstances",
+                "ec2:TerminateInstances",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus"
+              ],
+              "Resource": ""
+            }
+          ]
         }
-      ]
-    }
-      ```
-    6. Name the policy (for example: `gha-runner-policy`) and select "Create Policy".
-    7. Now select "Users" in the navigation pane and click "Add user".
-    8. Enter a username (for example: `gha-runner-user`) and ensure that "Provide user access to the AWS Management Console" is unchecked.
-    9. Select "Attach policies directly" and search for the policy you created earlier (`gha-runner-policy`) and select it.
-    10. Then click, "Create user".
-    11. Next, click on the user you just created and go to the "Security credentials" tab.
-    12. Click "Create access key" and then click "Other" and then "Next".
-    13. Click next and then copy the Access Key and Secret Access Key (or download the CSV file), these will not be shown again.
+        ```
+    5. Name the policy (e.g., `gha-runner-policy`) and click "Create Policy".
+    6. In the navigation pane, choose "Users" and click "Add user".
+    7. Enter a username (e.g., `gha-runner-user`) and ensure "Provide user access to the AWS Management Console" is unchecked.
+    8. Select "Attach policies directly", search for the policy you created (`gha-runner-policy`), and select it.
+    9. Click "Create user".
+    10. Click on the newly created user, go to the "Security credentials" tab, and click "Create access key".
+    11. Choose "Other", click "Next", and then copy the Access Key and Secret Access Key (or download the CSV file). These keys will not be shown again.
 2. Create your GitHub Access Token
     1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
     2. Go to your GitHub account settings.
@@ -62,3 +60,7 @@ You are now ready to start using this action with AWS!
 ## Useful Resources
 - [AWS - Creating IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_create.html)
 - [AWS - Creating an IAM User in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+- [AWS - Create a VPC](https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html)
+- [AWS - Create a subnet](https://docs.aws.amazon.com/vpc/latest/userguide/create-subnets.html)
+- [AWS - Work with security groups](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-groups.html)
+- [AWS - Create an AMI from an Amazon EC2 Instance](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
