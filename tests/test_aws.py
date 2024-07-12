@@ -226,6 +226,14 @@ def test_wait_until_removed_dne(aws):
         aws.wait_until_removed(ids, **params)
 
 
+@pytest.mark.slow
+def test_wait_until_removed_dne_long(aws):
+    # This is a fake instance id
+    ids = ["i-xxxxxxxxxxxxxxxxx"]
+    with pytest.raises(WaiterError):
+        aws.wait_until_removed(ids)
+
+
 def test_build_user_data(aws):
     params = {
         "homedir": "/home/ec2-user",
