@@ -50,18 +50,22 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
       - `GITHUB_TOKEN` - The GitHub token you copied earlier.
 4. Choose an (or create) an AMI
     - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
-        - For P2 instance types we have created an AMI to work with the CUDA driver for the Nvidia K80, see the table below
+        - For P2 instance types we have created an AMI to work with the CUDA driver for the Nvidia K80, see the table below.
         - For all other Nvidia GPU instances, we recommend using the [Amazon Deep Learning AMI](https://aws.amazon.com/blogs/machine-learning/get-started-with-deep-learning-using-the-aws-deep-learning-ami/)
     - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
     - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
 
+**NOTE**: If you are already using AWS for EC2, you may consider creating a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html), [subnet](https://docs.aws.amazon.com/vpc/latest/userguide/create-subnets.html), and a [security group](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-groups.html) with outbound traffic on port 443 to isolate your runners from the rest of your AWS account.
+
+You are now ready to start using this action with AWS!
+
+### OMSF p2.xlarge AMI Table
 | AMI | Region | Instance Type |
 |-----|--------|---------------|
 | ami-073f98140576b5a81 | us-east-1 | p2 |
 
-**NOTE**: If you are already using AWS for EC2, you may consider creating a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html), [subnet](https://docs.aws.amazon.com/vpc/latest/userguide/create-subnets.html), and a [security group](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-groups.html) with outbound traffic on port 443 to isolate your runners from the rest of your AWS account.
+**NOTE**: P2 instances use version 470 for the Nvidia kernel driver. As a result, we only ship CUDA v11.4 in the AMI(s) above. You _must_ pin your `cudatoolkit` to be 11.4 to use this instance type.
 
-You are now ready to start using this action with AWS!
 
 
 ## Additional notes for requesting GPU instances on new accounts
