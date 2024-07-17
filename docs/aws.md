@@ -73,6 +73,70 @@ You are now ready to start using this action with AWS!
 ## Additional notes for requesting GPU instances on new accounts
 By default, AWS accounts have [a quota of 0 for GPU instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html#ec2-on-demand-instances-limits). To increase your quota, use [this AWS doc](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase).
 
+## Example: Ubuntu
+```yaml
+name: Test Self-Hosted Runner
+on:
+  workflow_dispatch:
+
+jobs:
+  start-aws-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      mapping: ${{ steps.aws-start.outputs.mapping }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: <your-region-here>
+      - name: Create cloud runner
+        id: aws-start
+        uses: omsf-eco-infra/gha-runner@65bb42ed16b6440d06f24da8d75b549ab127b9a6
+        with:
+          provider: "aws"
+          action: "start"
+          aws_image_id: ami-XXXXXXXXXXXXXXXXX
+          aws_instance_type: <your instance type here>
+          aws_region_name: us-east-1
+          aws_home_dir: /home/ubuntu
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+  self-hosted-test:
+    runs-on: self-hosted
+    needs:
+      - start-aws-runner
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print disk usage
+        run: "df -h"
+      - name: Print Docker details
+        run: "docker version || true"
+  stop-aws-runner:
+    runs-on: ubuntu-latest
+    needs:
+      - start-aws-runner
+      - self-hosted-test
+    if: ${{ always() }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Stop instances
+        uses: omsf-eco-infra/gha-runner@65bb42ed16b6440d06f24da8d75b549ab127b9a6
+        with:
+          provider: "aws"
+          action: "stop"
+          instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
+          aws_region_name: us-east-1
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+
+```
 
 ## Useful Resources
 - [AWS - Creating IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_create.html)
