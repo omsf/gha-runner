@@ -22,7 +22,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
                 "ec2:DescribeInstances",
                 "ec2:DescribeInstanceStatus"
               ],
-              "Resource": ""
+              "Resource": "*"
             }
           ]
         }
