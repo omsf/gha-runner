@@ -47,7 +47,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
     4. Add the following secrets:
       - `AWS_ACCESS_KEY_ID` - The Access Key you copied earlier.
       - `AWS_SECRET_ACCESS_KEY` - The Secret Access Key you copied earlier.
-      - `GITHUB_TOKEN` - The GitHub token you copied earlier.
+      - `GH_PAT` - The GitHub token you copied earlier.
 4. Choose an (or create) an AMI
     - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
     - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
