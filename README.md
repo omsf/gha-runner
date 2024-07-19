@@ -17,7 +17,6 @@ For more information see the [self-hosted runner security docs](https://docs.git
 |----------|----------------------------------------------------------------------------|----------|---------|
 | action   | Whether to start or stop. Options: "start", "stop"                         | true     |         |
 | provider | The cloud provider to use to provision a runner. Will not start if not set.| true     |         |
-| gh_pat   | The GHA Personal Access Token (PAT)                                        | true     |         |
 | repo     | The repo to run against. Will use the current repo if not specified.       | false    | The repo the runner is running in |
 
 ### AWS `start` Inputs

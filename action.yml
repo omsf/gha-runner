@@ -34,9 +34,6 @@ inputs:
   extra_gh_labels:
     description: "Any extra GitHub lables to tag your runners with. Passed as a comma-seperated list with no spaces."
     required: false
-  gh_pat:
-    description: "The GHA Personal Access Token (PAT)"
-    required: true
   instance_count:
     description: "The number of instances to create, defaults to 1"
     required: false
