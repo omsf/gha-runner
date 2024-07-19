@@ -1,6 +1,14 @@
 # gha-runner
 A simple GitHub Action for creating self-hosted runners. Currently, this only supports AWS and x86_64 Linux AMIs. This runner is heavily inspired by [ec2-github-runner](https://github.com/machulav/ec2-github-runner) but rewritten to support additional cloud providers and to better meet some needs of the OMSF community.
 
+## A note on security before using this action
+The following is a note from GitHub on using self-hosted runners on public repos.
+
+> We recommend that you do not use self-hosted runners with public repositories.
+>
+> Forks of your public repository can potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow.
+
+For more information see the [self-hosted runner security docs](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security-with-public-repositories). As well as some good [community recommendations and pitfalls](https://github.com/orgs/community/discussions/26722).
 
 ## Inputs
 
