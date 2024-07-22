@@ -13,6 +13,9 @@ For more information see the [self-hosted runner security docs](https://docs.git
 ## Cloud Setup Docs
 - [AWS](docs/aws.md)
 
+## Example Setups
+- [openmm-gpu-test](https://github.com/omsf-eco-infra/openmm-gpu-test) - a simple GPU for validating OpenMM on AWS
+
 ## Inputs
 
 ### Shared Inputs
@@ -45,69 +48,6 @@ For more information see the [self-hosted runner security docs](https://docs.git
 | Name | Description |
 | ---- | ----------- |
 | mapping | A JSON object mapping instance IDs to unique GitHub runner labels. This is used in conjunction with the `instance_mapping` input when stopping. |
-
-## Using the action
-Set up the following GitHub Action for to provision instances on AWS:
-```yaml
-name: Testing
-on: [push]
-
-jobs:
-  hello_world_job:
-    runs-on: ubuntu-latest
-    name: Test the gha_runner
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Local runner run
-        id: aws_start
-        uses: omsf-eco-infra/gha-runner@latest # This is pending publishing of this action
-        with:
-          repo: "<the repo name in terms of org/name, if not provided the current repo will be used>"
-          provider: "aws"
-          action: "start"
-          instance_count: <the number of instances, if not provided, defaults to 1>
-          aws_image_id: <the AWS image AMI to use for your runner>
-          aws_instance_type: <the AWS instance type>
-          aws_subnet_id: <the AWS subnet ID, will use default by default, optional>
-          aws_security_group_id: <the AWS security group ID, will use default by default, optional>
-          aws_iam_role: <the AWS IAM role to use, optional>
-          aws_region_name: <AWS region name, required>
-          aws_home_dir: <the ec2 instance home directory, for Amazon Linux 2023/Amazon Linux 2 this is /home/ec2-user>
-          aws_labels: <labels provided to AWS to be added to the GitHub runner>
-          # NOTE: aws_tags are provided as a list of key-values as seen below
-          aws_tags: >
-            [
-              {"Key": "Name", "Value": "test"}
-              {"Key": "Other", "Value": "item"}
-            ]
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }} # Your GH PAT access token with enough scope to create runners
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # Your AWS access key id
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # You AWS secret access key
-      - name: Your test here
-        id: test
-        runs-on: self-hosted
-      - name: Stop instances
-        needs:
-          - aws_start
-          - test
-        if: ${{ always() }}
-        uses: omsf-eco-infra/gha-runner@latest # This is pending publishing of this action
-        with:
-          repo: "<the repo name in terms of org/name, if not provided the current repo will be used>"
-          provider: "aws"
-          action: "stop"
-          # NOTE: The output below is a JSON formatted mapping of AWS instance IDs to runner names. Below is the recommended usage.
-          instance_mapping: ${{ steps.aws_start.outputs.mapping }}
-          aws_region_name: <AWS region name, required>
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
-```
 
 ## Testing the action in development
 Testing the action was primarily done using [nektos/act]("https://github.com/nektos/act") to test locally. To do a test run with some basic defaults:
