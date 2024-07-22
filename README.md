@@ -8,7 +8,10 @@ The following is a note from GitHub on using self-hosted runners on public repos
 >
 > Forks of your public repository can potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow.
 
-For more information see the [self-hosted runner security docs](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security-with-public-repositories). As well as some good [community recommendations and pitfalls](https://github.com/orgs/community/discussions/26722).
+For more information see the [self-hosted runner security docs](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security-with-public-repositories). As well as some good [community recommendations and pitfalls](https://github.com/orgs/community/discussions/26722). We _do not_ recommend running these pipelines on a PR.
+
+## Cloud Setup Docs
+- [AWS](docs/aws.md)
 
 ## Inputs
 
