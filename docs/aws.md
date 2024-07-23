@@ -5,7 +5,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
 - An AWS account
 
 ## Setup
-0. Set up the OpenID Connect (OIDC) Provider
+1. Set up the OpenID Connect (OIDC) Provider
     1. Sign into your AWS Management Console.
     2. Go to the IAM Console.
     3. In the navigation pane, choose "Identity Provider".
@@ -14,7 +14,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
         - Provider URL - `https://token.actions.githubusercontent.com`
         - Audience - `sts.amazonaws.com`
     6. Click "Add Provider" at the bottom of the page to assign it.
-1. Prepare a Policy
+2. Prepare a Policy
     1. Sign in to your AWS Management Console.
     2. Go to the IAM console.
     3. In the navigation pane, choose "Policies" and click "Create Policy".
@@ -37,7 +37,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
         }
         ```
     5. Name the policy (e.g., `gha-runner-policy`) and click "Create Policy".
-2. Create an IAM role
+3. Create an IAM role
     1. Sign into your AWS Management Console.
     2. Go to the IAM Console.
     3. In the navigation pane, select "Role" and then click "Create Role".
@@ -52,19 +52,19 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
     9. Now find and select the policy created earlier (if you used above, this would be `gha-runner-policy`) and then click "Next".
     10. Add a role name and description.
     11. Select your newly named role and copy the ARN, we will use this later.
-3. Create your GitHub Access Token
+4. Create your GitHub Access Token
     1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
     2. Go to your GitHub account settings.
     3. Click on "Developer settings".
     4. Create a new token with `repo` scope.
     5. Save and/or copy the token.
-4. Add your credentials to your repository secrets
+5. Add your credentials to your repository secrets
     1. Go to your repository on GitHub.
     2. Click on "Settings", then "Secrets and Variables", and then "Actions".
     3. Click "New repository secret".
     4. Add the following secrets:
       - `GH_PAT` - The GitHub token you copied earlier.
-5. Choose an (or create) an AMI
+6. Choose an (or create) an AMI
     - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
     - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
     - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
