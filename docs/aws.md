@@ -5,7 +5,16 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
 - An AWS account
 
 ## Setup
-1. Prepare an IAM user with AWS access keys
+1. Set up the OpenID Connect (OIDC) Provider
+    1. Sign into your AWS Management Console.
+    2. Go to the IAM Console.
+    3. In the navigation pane, choose "Identity Provider".
+    4. Click "Add Provider".
+    5. Select "OpenID Connect" and add the following
+        - Provider URL - `https://token.actions.githubusercontent.com`
+        - Audience - `sts.amazonaws.com`
+    6. Click "Add Provider" at the bottom of the page to assign it.
+2. Prepare a Policy
     1. Sign in to your AWS Management Console.
     2. Go to the IAM console.
     3. In the navigation pane, choose "Policies" and click "Create Policy".
@@ -28,27 +37,34 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
         }
         ```
     5. Name the policy (e.g., `gha-runner-policy`) and click "Create Policy".
-    6. In the navigation pane, choose "Users" and click "Add user".
-    7. Enter a username (e.g., `gha-runner-user`) and ensure "Provide user access to the AWS Management Console" is unchecked.
-    8. Select "Attach policies directly", search for the policy you created (`gha-runner-policy`), and select it.
-    9. Click "Create user".
-    10. Click on the newly created user, go to the "Security credentials" tab, and click "Create access key".
-    11. Choose "Other", click "Next", and then copy the Access Key and Secret Access Key (or download the CSV file). These keys will not be shown again.
-2. Create your GitHub Access Token
+3. Create an IAM role
+    1. Sign into your AWS Management Console.
+    2. Go to the IAM Console.
+    3. In the navigation pane, select "Role" and then click "Create Role".
+    4. Select "Web Identity" for the trusted entity type.
+    5. Set your identity provider to "tokens.actions.githubusercontent.com"
+    6. Set the audience to `sts.amazonaws.com`
+    7. Set your GitHub auth rules:
+        - GitHub organization - This would be your org or username for example, `omsf-eco-infra`. This limits it so that credentials are only given to this organization.
+        - GitHub repository - This would limit the scope of this authentication to a given repo. You may choose to set or extend this in the future.
+        - GitHub branch - This further restricts usage to a single branch.
+    8. Click "Next".
+    9. Now find and select the policy created earlier (if you used above, this would be `gha-runner-policy`) and then click "Next".
+    10. Add a role name and description.
+    11. Select your newly named role and copy the ARN, we will use this later.
+4. Create your GitHub Access Token
     1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
     2. Go to your GitHub account settings.
     3. Click on "Developer settings".
     4. Create a new token with `repo` scope.
     5. Save and/or copy the token.
-3. Add your credentials to your repository secrets
+5. Add your credentials to your repository secrets
     1. Go to your repository on GitHub.
     2. Click on "Settings", then "Secrets and Variables", and then "Actions".
     3. Click "New repository secret".
     4. Add the following secrets:
-      - `AWS_ACCESS_KEY_ID` - The Access Key you copied earlier.
-      - `AWS_SECRET_ACCESS_KEY` - The Secret Access Key you copied earlier.
       - `GH_PAT` - The GitHub token you copied earlier.
-4. Choose an (or create) an AMI
+6. Choose an (or create) an AMI
     - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
     - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
     - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
@@ -74,14 +90,16 @@ on:
 jobs:
   start-aws-runner:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     outputs:
       mapping: ${{ steps.aws-start.outputs.mapping }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: <your-IAM-Role-ARN>
           aws-region: <your-region-here>
       - name: Create cloud runner
         id: aws-start
@@ -107,6 +125,9 @@ jobs:
         run: "docker version || true"
   stop-aws-runner:
     runs-on: ubuntu-latest
+    permissions:
+        id-token: write
+        contents: read
     needs:
       - start-aws-runner
       - self-hosted-test
@@ -115,8 +136,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: <your-IAM-Role-ARN>
           aws-region: us-east-1
       - name: Stop instances
         uses: omsf-eco-infra/gha-runner@v0.2.0
@@ -140,3 +160,5 @@ jobs:
 - [AWS - On-Demand Instance Quotas](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html#ec2-on-demand-instances-limits)
 - [AWS - Request Increase](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase)
 - [AWS - Get Started with Deep Learning Using the AWS Deep Learning AMI](https://aws.amazon.com/blogs/machine-learning/get-started-with-deep-learning-using-the-aws-deep-learning-ami/)
+- [GitHub - Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+- [AltF4 - Using IAM the secure way in GitHub Actions](https://altf4.blog/blog/2024-03-03-using-iam-the-secure-way-in-github-actions/)
