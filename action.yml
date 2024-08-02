@@ -47,6 +47,9 @@ inputs:
   repo:
     description: "The repo to run against. Will use the the current repo if not specified."
     required: false
+  gh_timeout:
+    description: 'The amount of timeout for waiting for a runner to be online by GitHub.'
+    required: false
 outputs:
   mapping:
     description: "A JSON object mapping instance IDs to unique GitHub runner labels. This is used in conjection with the the `instance_mapping` input when stopping."

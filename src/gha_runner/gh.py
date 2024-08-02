@@ -12,6 +12,7 @@ import string
 class TokenRetrievalError(Exception):
     """Exception raised when there is an error retrieving a token from GitHub."""
 
+
 class MissingRunnerLabel(Exception):
     """Exception raised when a runner does not exist in the repository."""
 
@@ -189,7 +190,7 @@ class GitHubInstance:
         ]
         return matched_runners if matched_runners else None
 
-    def wait_for_runner(self, label: str, wait: int = 15):
+    def wait_for_runner(self, label: str, timeout: int, wait: int = 15):
         """Wait for the runner with the given label to be online.
 
         Parameters
@@ -198,10 +199,15 @@ class GitHubInstance:
             The label of the runner to wait for.
         wait : int
             The time in seconds to wait between checks. Defaults to 15 seconds.
-
+        timeout : int
+            The maximum time in seconds to wait for the runner to be online.
+            Defaults to 300 seconds.
         """
+        max = time.time() + timeout
         runner = self.get_runner(label)
         while runner is None:
+            if time.time() > max:
+                raise RuntimeError(f"Timeout reached: Runner {label} not found")
             print(f"Runner {label} not found. Waiting...")
             runner = self.get_runner(label)
             time.sleep(wait)
