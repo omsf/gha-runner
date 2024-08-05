@@ -146,12 +146,9 @@ def main():  # pragma: no cover
     provider = os.environ.get("INPUT_PROVIDER")
     if provider is None:
         raise Exception("Missing required input variable INPUT_PROVIDER")
-    gh_timeout_var = os.environ.get("INPUT_GH_TIMEOUT")
-    # Set the default timeout to 10 minutes
+    # Set the default timeout to 20 minutes
+    gh_timeout = int(os.environ.get("INPUT_GH_TIMEOUT", 1200))
     gh_timeout = 1200
-    # If the user has set the timeout, we will use that instead
-    if gh_timeout_var is not None:
-        gh_timeout = int(gh_timeout_var)
 
     gha_params = {
         "token": os.environ["GH_PAT"],
