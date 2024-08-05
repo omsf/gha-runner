@@ -201,7 +201,6 @@ class GitHubInstance:
             The time in seconds to wait between checks. Defaults to 15 seconds.
         timeout : int
             The maximum time in seconds to wait for the runner to be online.
-            Defaults to 300 seconds.
         """
         max = time.time() + timeout
         runner = self.get_runner(label)
