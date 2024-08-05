@@ -396,3 +396,32 @@ def test_wait_for_runner(github_release_mock, mock_get_runner, capsys):
     assert captured.out == combined
     # Validate that the get_runner method was called the correct number of times
     assert get_runner_mock.call_count == len(expected_calls)
+
+@pytest.fixture
+def mock_get_runner_timeout(monkeypatch):
+    label = "runner-linux-x64"
+    side_effect = [None, None]
+    # Dynamically build out the expected calls based on the side_effect
+    expected_calls = [
+        f"Runner {label} not found. Waiting...\n ",
+    ]
+
+    get_runner_mock = MagicMock()
+    # Setup the side_effect for the get_runner_mock
+    get_runner_mock.side_effect = side_effect
+    monkeypatch.setattr(GitHubInstance, "get_runner", get_runner_mock)
+    return get_runner_mock, label, expected_calls
+
+def test_wait_for_runner_timeout(github_release_mock, mock_get_runner_timeout, capsys):
+    instance, _, _ = github_release_mock
+    get_runner_mock, label, expected_calls = mock_get_runner_timeout
+    with pytest.raises(RuntimeError, match=f"Timeout reached: Runner {label} not found"):
+        instance.wait_for_runner(label, timeout=1, wait=1)
+        captured = capsys.readouterr()
+        # Combine all expected calls into a single string
+        combined = "".join(expected_calls)
+
+        # Validate that the expected output matches the captured output
+        assert captured.out == combined
+        # Validate that the get_runner method was called the correct number of times
+        assert get_runner_mock.call_count == len(expected_calls)
