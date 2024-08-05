@@ -148,7 +148,6 @@ def main():  # pragma: no cover
         raise Exception("Missing required input variable INPUT_PROVIDER")
     # Set the default timeout to 20 minutes
     gh_timeout = int(os.environ.get("INPUT_GH_TIMEOUT", 1200))
-    gh_timeout = 1200
 
     gha_params = {
         "token": os.environ["GH_PAT"],
