@@ -1,8 +1,8 @@
 name: gha-runner
 description: A simple GitHub Action for creating self-hosted runners.
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "docker"
+  image: "Dockerfile"
 inputs:
   action:
     description: 'Whether to start or stop. Options: "start", "stop"'
@@ -37,9 +37,9 @@ inputs:
   instance_count:
     description: "The number of instances to create, defaults to 1"
     required: false
-    default: '1'
+    default: "1"
   instance_mapping:
-    description: 'A JSON object mapping instance ids to unique GitHub runner labels. Required to stop created instances.'
+    description: "A JSON object mapping instance ids to unique GitHub runner labels. Required to stop created instances."
     required: false
   provider:
     description: 'The cloud provider to use to provision a runner. Will not start if not set. Example: "aws"'
@@ -48,7 +48,7 @@ inputs:
     description: "The repo to run against. Will use the the current repo if not specified."
     required: false
   gh_timeout:
-    description: 'The amount of timeout for waiting for a runner to be online by GitHub.'
+    description: "The timeout in seconds to wait for the runner to come online as seen by the GitHub API. Defaults to 1200 seconds."
     required: false
 outputs:
   mapping:
