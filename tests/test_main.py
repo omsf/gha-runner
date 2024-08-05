@@ -181,6 +181,7 @@ def test_start_runner_instances_smoke(
             gh=mock_gh,
             count=1,
             cloud_params={},
+            timeout=0,
         )
     except Exception as e:
         pytest.fail(f"Exception raised: {e}")

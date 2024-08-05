@@ -50,7 +50,11 @@ def get_instance_mapping() -> dict[str, str]:
 
 
 def start_runner_instances(
-    provider: str, cloud_params: dict, gh: GitHubInstance, count: int
+    provider: str,
+    cloud_params: dict,
+    gh: GitHubInstance,
+    count: int,
+    timeout: int,
 ):
     release = gh.get_latest_runner_release(platform="linux", architecture="x64")
     cloud_params["runner_release"] = release
@@ -75,7 +79,7 @@ def start_runner_instances(
     print("Instance is ready!")
     for label in github_labels:
         print(f"Waiting for {label}...")
-        gh.wait_for_runner(label)
+        gh.wait_for_runner(label, timeout)
 
 
 def stop_runner_instances(
@@ -142,6 +146,8 @@ def main():  # pragma: no cover
     provider = os.environ.get("INPUT_PROVIDER")
     if provider is None:
         raise Exception("Missing required input variable INPUT_PROVIDER")
+    # Set the default timeout to 20 minutes
+    gh_timeout = int(os.environ.get("INPUT_GH_TIMEOUT", 1200))
 
     gha_params = {
         "token": os.environ["GH_PAT"],
@@ -165,6 +171,7 @@ def main():  # pragma: no cover
             cloud_params,
             gh,
             instance_count,
+            gh_timeout,
         )
     elif action == "stop":
         stop_runner_instances(provider, cloud_params, gh)
