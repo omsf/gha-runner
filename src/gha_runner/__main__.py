@@ -148,7 +148,7 @@ def main():  # pragma: no cover
         raise Exception("Missing required input variable INPUT_PROVIDER")
     gh_timeout_var = os.environ.get("INPUT_GH_TIMEOUT")
     # Set the default timeout to 10 minutes
-    gh_timeout = 600
+    gh_timeout = 1200
     # If the user has set the timeout, we will use that instead
     if gh_timeout_var is not None:
         gh_timeout = int(gh_timeout_var)

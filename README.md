@@ -38,7 +38,7 @@ For more information see the [self-hosted runner security docs](https://docs.git
 | aws_tags              | The AWS tags to use for your runner, formatted as a JSON list. See `README` for more details.                      | false              |         |
 | extra_gh_labels       | Any extra GitHub labels to tag your runners with. Passed as a comma-separated list with no spaces.                 | false              |         |
 | instance_count        | The number of instances to create, defaults to 1                                                                   | false              | 1       |
-| gh_timeout            | The amount of timeout for waiting for a runner to be online by GitHub.                                             | false              | 600     |
+| gh_timeout            | The amount of timeout for waiting for a runner to be online by GitHub.                                             | false              | 1200    |
 
 ### AWS `stop` Inputs
 | Input             | Description                                                                                                                                                         | Required for stop| Default | Note |
