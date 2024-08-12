@@ -66,6 +66,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
       - `GH_PAT` - The GitHub token you copied earlier.
 6. Choose an (or create) an AMI
     - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
+    - To find an AMI, we recommend using the following [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) to find AMIs in the AWS console. The easiest way to do this is by trying to create an instance and copying the AMI ID you want to use. To note, if you end in the AWS Marketplace, you have probably gone too far.
     - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
     - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
     - Please see below for more information on recommendations for GPU instances
@@ -81,7 +82,6 @@ We recommend the use of the `g4dn.xlarge` instance type as it is a good mix of A
 ## Additional notes for requesting GPU instances on new accounts
 By default, AWS accounts have [a quota of 0 for vCPUS for GPU instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html#ec2-on-demand-instances-limits). To increase your quota, use [this AWS doc](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase). If you are going to use this action with G instances, you will want to increase your vCPU quota for G instance types, four is the minimum needed to run the `g4dn` instance.
 
-To find AMIs for (for example) us-east-1, you can use the search bar on this page: https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#LaunchInstances: (if you've ended up on AWS Marketplace, you're in the wrong place)
 
 ## Example: Ubuntu
 ```yaml
@@ -111,7 +111,7 @@ jobs:
           action: "start"
           aws_image_id: <your-ami-here, for example ami-0d5079d9be06933e5>
           aws_instance_type: <your instance type here, for example g4dn.xlarge>
-          aws_region_name: us-east-1
+          aws_region_name: <your-region-here, for example us-east-1>
           aws_home_dir: /home/ubuntu
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -139,14 +139,14 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: <your-IAM-Role-ARN>
-          aws-region: us-east-1
+          aws-region: <your-region-here, for example us-east-1>
       - name: Stop instances
         uses: omsf-eco-infra/gha-runner@v0.2.0
         with:
           provider: "aws"
           action: "stop"
           instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
-          aws_region_name: us-east-1
+          aws_region_name: <your-region-here, for example us-east-1>
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
