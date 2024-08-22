@@ -161,7 +161,10 @@ class AWS(CloudDeployment):
             raise ValueError(
                 "No region name provided, cannot create instances."
             )
-        ec2 = boto3.client("ec2", region_name=self.region_name)
+        if self.region_name is None:
+            ec2 = boto3.client("ec2")
+        else:
+            ec2 = boto3.client("ec2", region_name=self.region_name)
         id_dict = {}
         for token in self.gh_runner_tokens:
             label = GitHubInstance.generate_random_label()
