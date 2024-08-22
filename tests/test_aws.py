@@ -142,6 +142,15 @@ def test_create_instances_missing_instance_type(aws):
         aws.create_instances()
 
 
+def test_create_instances_missing_region(aws):
+    aws.region_name = None
+    os.environ.pop("AWS_DEFAULT_REGION")
+    with pytest.raises(
+        ValueError, match="No region name provided, cannot create instances."
+    ):
+        aws.create_instances()
+
+
 def test_instance_running(aws):
     ids = aws.create_instances()
     assert len(ids) == 1
@@ -200,6 +209,18 @@ def test_remove_instances(aws):
     ids = list(ids)
     aws.remove_instances(ids)
     assert not aws.instance_running(ids[0])
+
+
+def test_remove_instances_missing_region(aws):
+    ids = aws.create_instances()
+    assert len(ids) == 1
+    ids = list(ids)
+    aws.region_name = None
+    os.environ.pop("AWS_DEFAULT_REGION")
+    with pytest.raises(
+        ValueError, match="No region name provided, cannot create instances."
+    ):
+        aws.remove_instances(ids)
 
 
 def test_wait_until_removed(aws):
