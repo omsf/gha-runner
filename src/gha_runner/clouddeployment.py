@@ -1,13 +1,9 @@
-import importlib.resources
-import os
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from string import Template
-from typing import Optional
-
-import boto3
-
 from gha_runner.gh import GitHubInstance
+from dataclasses import dataclass, field
+import importlib.resources
+import boto3
+from string import Template
 
 
 class CloudDeployment(ABC):
@@ -93,6 +89,7 @@ class AWS(CloudDeployment):
     instance_type: str
     home_dir: str
     repo: str
+    region_name: str
     runner_release: str = ""
     tags: list[dict[str, str]] = field(default_factory=list)
     gh_runner_tokens: list[str] = field(default_factory=list)
@@ -101,7 +98,6 @@ class AWS(CloudDeployment):
     security_group_id: str = ""
     iam_role: str = ""
     script: str = ""
-    region_name: Optional[str] = None
 
     def _build_aws_params(self, user_data_params: dict) -> dict:
         """Build the parameters for the AWS API call.
@@ -157,14 +153,7 @@ class AWS(CloudDeployment):
             raise ValueError(
                 "No instance type provided, cannot create instances."
             )
-        if self.region_name is None and "AWS_DEFAULT_REGION" not in os.environ:
-            raise ValueError(
-                "No region name provided, cannot create instances."
-            )
-        if self.region_name is None:
-            ec2 = boto3.client("ec2")
-        else:
-            ec2 = boto3.client("ec2", region_name=self.region_name)
+        ec2 = boto3.client("ec2", region_name=self.region_name)
         id_dict = {}
         for token in self.gh_runner_tokens:
             label = GitHubInstance.generate_random_label()
@@ -191,10 +180,6 @@ class AWS(CloudDeployment):
         return id_dict
 
     def remove_instances(self, ids: list[str]):
-        if self.region_name is None and "AWS_DEFAULT_REGION" not in os.environ:
-            raise ValueError(
-                "No region name provided, cannot create instances."
-            )
         ec2 = boto3.client("ec2", self.region_name)
         params = {
             "InstanceIds": ids,
