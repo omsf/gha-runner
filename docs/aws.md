@@ -97,6 +97,7 @@ jobs:
       contents: read
     outputs:
       mapping: ${{ steps.aws-start.outputs.mapping }}
+      instances: ${{ steps.aws-start.outputs.instances }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -116,7 +117,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
   self-hosted-test:
-    runs-on: self-hosted
+    runs-on: ${{ needs.start-aws-runner.outputs.instances }}
     needs:
       - start-aws-runner
     steps:
