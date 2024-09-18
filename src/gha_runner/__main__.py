@@ -74,6 +74,8 @@ def start_runner_instances(
     with open(os.environ["GITHUB_OUTPUT"], "a") as output:
         json_mappings = json.dumps(mappings)
         output.write(f"mapping={json_mappings}\n")
+        json_labels = json.dumps(github_labels)
+        output.write(f"instances={json_labels}\n")
     print("Waiting for instance to be ready...")
     cloud.wait_until_ready(instance_ids)
     print("Instance is ready!")
