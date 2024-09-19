@@ -106,7 +106,7 @@ jobs:
           aws-region: <your-region-here, for example us-east-1>
       - name: Create cloud runner
         id: aws-start
-        uses: omsf-eco-infra/gha-runner@v0.2.0
+        uses: omsf-eco-infra/gha-runner@v0.3.0
         with:
           provider: "aws"
           action: "start"
@@ -117,7 +117,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
   self-hosted-test:
-    runs-on: ${{ needs.start-aws-runner.outputs.instances }}
+    runs-on: ${{ fromJSON(needs.start-aws-runner.outputs.instances) }} # This ensures that you only run on the instances you just provisioned
     needs:
       - start-aws-runner
     steps:
@@ -142,7 +142,7 @@ jobs:
           role-to-assume: <your-IAM-Role-ARN>
           aws-region: <your-region-here, for example us-east-1>
       - name: Stop instances
-        uses: omsf-eco-infra/gha-runner@v0.2.0
+        uses: omsf-eco-infra/gha-runner@v0.3.0
         with:
           provider: "aws"
           action: "stop"
