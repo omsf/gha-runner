@@ -1,5 +1,4 @@
 from ruamel.yaml import YAML
-from collections import OrderedDict
 import click
 
 
@@ -98,11 +97,11 @@ def read_file(input_file, role, region, ami, instance_type, home_dir):
     yaml.default_flow_style = False
     # yaml.preserve_quotes = True
     data = yaml.load(input_file)
-    jobs = data.get("jobs", OrderedDict())
+    jobs = data.get("jobs", {})
     job_name = ""
     for job in data["jobs"]:
         job_name = job
-    new_job_list = OrderedDict()
+    new_job_list = {}
     before = before_job(role, region, ami, instance_type, home_dir)
     after = after_job(job_name, role, region)
     for k, v in jobs.items():
