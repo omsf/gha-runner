@@ -104,6 +104,9 @@ def read_file(input_file, role, region, ami, instance_type, home_dir):
     new_job_list = {}
     before = before_job(role, region, ami, instance_type, home_dir)
     after = after_job(job_name, role, region)
+    if len(jobs) > 1:
+        print("Only one job is allowed")
+        exit(1)
     for k, v in jobs.items():
         if k == job_name:
             new_job_list.update(before)
