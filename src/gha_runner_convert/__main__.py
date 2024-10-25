@@ -125,5 +125,5 @@ def read_file(input_file, role, region, ami, instance_type, home_dir):
     yaml.dump(data, click.get_text_stream("stdout"))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     read_file()
