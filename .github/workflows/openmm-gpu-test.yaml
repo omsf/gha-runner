@@ -3,80 +3,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  start-aws-runner:
+  run-matrix:
+    name: Run Matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        instance_type: ["g4dn.xlarge", "t3.large"]
+    uses: ./.github/workflows/reusable-gpu-test.yaml
     permissions:
       id-token: write
       contents: read
-    runs-on: ubuntu-latest
-    outputs:
-      mapping: ${{ steps.aws-start.outputs.mapping }}
-      instances: ${{ steps.aws-start.outputs.instances }}
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }} # Using so this can be added outside of PR
-          aws-region: us-east-1 
-      - name: Create cloud runner
-        id: aws-start
-        uses: ./ # Use the action stored in the root
-        with:
-          provider: "aws"
-          action: "start"
-          aws_region_name: us-east-1
-          aws_image_id: ami-0f7c4a792e3fb63c8 
-          aws_instance_type: g4dn.xlarge
-          aws_home_dir: /home/ubuntu
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-  openmm-test:
-    runs-on: ${{ fromJSON(needs.start-aws-runner.outputs.instances) }}
-    defaults:
-      run:
-        shell: bash -leo pipefail {0}
-    needs:
-      - start-aws-runner
-    steps:
-      - uses: actions/checkout@v4
-      - name: Print disk usage
-        run: "df -h"
-      - name: Print Docker details
-        run: "docker version || true"
-      - name: Check for nvidia-smi
-        run: "nvidia-smi || true"
-      - uses: mamba-org/setup-micromamba@main
-        with:
-          environment-name: openmm
-          create-args: >-
-            openmm
-          condarc: |
-            channels:
-              - conda-forge
-      - name: Test for GPU
-        id: gpu_test
-        run: python -m openmm.testInstallation
-  stop-aws-runner:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    needs:
-      - start-aws-runner
-      - openmm-test
-    if: ${{ always() }}
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-      - name: Stop instances
-        uses: ./
-        with:
-          provider: "aws"
-          action: "stop"
-          aws_region_name: us-east-1
-          instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-
+    with:
+      instance_type: ${{ matrix.instance_type }}
+    secrets: inherit # Bring in the secrets to the reused actions.
