@@ -1,8 +1,8 @@
 # Using a `matrix` with the `gha-runner` action.
-Using a matrix requires a bit more than you may be used to in GitHub Actions. This is because we have to reuse multiple workflow steps that depend on each other. In order to achieve this, we recommend using [reusable workflows](https://docs.github.com/en/actions/sharing-automations/reusing-workflows). Reusable workflows allow for you to group the multiple steps together. For a practical example of this, see how we use it for integration testing in [reusable-gpu-test.yaml](.github/workflows/reusable-gpu-test.yaml) and [openmm-gpu-test.yaml](./github/workflows/openmm-gpu-test.yaml).
+Using a `matrix` with the `gha-runner` action requires some extra steps due to the need to reuse multiple dependent workflow steps. To achieve this, we recommend using [reusable workflows](https://docs.github.com/en/actions/sharing-automations/reusing-workflows). Reusable workflows allow you to group workflow steps together. For an example, see how we use it for integration testing in [reusable-gpu-test.yaml](.github/workflows/reusable-gpu-test.yaml) and [openmm-gpu-test.yaml](./github/workflows/openmm-gpu-test.yaml).
 
 ## Example
-Take the workflow that was use in [our AWS docs](docs/aws.md).
+Take the workflow that we use in [our AWS docs](docs/aws.md).
 ```yaml
 name: Test Self-Hosted Runner
 on:
