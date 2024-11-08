@@ -16,7 +16,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::730335439009:role/gha-runner-deploy
+          role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1 
       - name: Create cloud runner
         id: aws-start
@@ -70,7 +70,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::730335439009:role/gha-runner-deploy
+          role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
       - name: Stop instances
         uses: omsf-eco-infra/gha-runner@main
