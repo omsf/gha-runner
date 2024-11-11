@@ -6,4 +6,4 @@ RUN mkdir /app
 ADD . /app
 WORKDIR /app
 RUN uv sync --locked # This installs the dependencies
-CMD ["uv", "run", "-m", "gha-runner"]
+CMD ["uv", "run", "/app/src/gha_runner/"]
