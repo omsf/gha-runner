@@ -20,7 +20,7 @@ jobs:
           aws-region: us-east-1 
       - name: Create cloud runner
         id: aws-start
-        uses: ./
+        uses: omsf-eco-infra/gha-runner@testing
         with:
           provider: "aws"
           action: "start"
@@ -73,7 +73,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
       - name: Stop instances
-        uses: ./
+        uses: omsf-eco-infra/gha-runner@testing
         with:
           provider: "aws"
           action: "stop"
