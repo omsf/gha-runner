@@ -5,4 +5,4 @@ ENV PYTHONUNBUFFERED=1
 ADD . /app
 WORKDIR /app
 RUN uv sync --frozen # This installs the dependencies
-CMD ["uv", "run", "-m", "gha_runner"]
+CMD ["uv", "run", "-m", "gha-runner"]
