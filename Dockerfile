@@ -3,7 +3,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONUNBUFFERED=1
 RUN mkdir /app
-WORKDIR /app
 ADD . /app
+WORKDIR /app
 RUN uv sync --locked # This installs the dependencies
-CMD ["uv", "run", "src/gha_runner"]
+CMD ["uv", "run", "-m", "src/gha_runner"]
