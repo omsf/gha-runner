@@ -5,5 +5,5 @@ ENV PYTHONUNBUFFERED=1
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
-RUN uv sync --locked # This installs the dependencies
+RUN uv sync # This installs the dependencies
 CMD ["uv", "run", "/app/src/gha_runner/"]
