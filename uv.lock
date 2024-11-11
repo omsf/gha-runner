@@ -292,7 +292,7 @@ wheels = [
 ]
 
 [[package]]
-name = "gha_runner"
+name = "gha-runner"
 version = "0.3.0"
 source = { editable = "." }
 dependencies = [
