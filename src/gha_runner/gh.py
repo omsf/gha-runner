@@ -205,6 +205,19 @@ class GitHubInstance:
             raise RunnerListError(f"Error getting runners: {e}")
 
     def get_runner(self, label: str) -> SelfHostedRunner:
+        """Get a runner by a given label for a repository.
+
+        Returns
+        -------
+        SelfHostedRunner
+            The runner with the given label.
+
+        Raises
+        ------
+        MissingRunnerLabel
+            If the runner with the given label is not found.
+
+        """
         runners = self.get_runners()
         if runners is not None:
             for runner in runners:
