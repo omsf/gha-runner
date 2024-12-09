@@ -114,7 +114,7 @@ def test_get_runners_no_json(github_instance):
         body="",
         status=200,
     )
-    with pytest.raises(RunnerListError, match="Error getting runners: *"):
+    with pytest.raises(RunnerListError, match="Did not receive mapping object: *"):
         github_instance.get_runners()
 
 
