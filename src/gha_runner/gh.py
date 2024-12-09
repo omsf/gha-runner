@@ -1,12 +1,14 @@
 """Module to manage GitHub repository actions through the GitHub API."""
 
-from github import Github, Auth
-from github.SelfHostedActionsRunner import SelfHostedActionsRunner
-import urllib.parse
-import requests
-import time
+import collections.abc
 import random
 import string
+import time
+import urllib.parse
+from dataclasses import dataclass
+from json import JSONDecodeError
+
+import requests
 
 
 class TokenRetrievalError(Exception):
@@ -15,6 +17,18 @@ class TokenRetrievalError(Exception):
 
 class MissingRunnerLabel(Exception):
     """Exception raised when a runner does not exist in the repository."""
+
+
+class RunnerListError(Exception):
+    """Exception raised when there is an error getting the list of runners."""
+
+
+@dataclass
+class SelfHostedRunner:
+    id: int
+    name: str
+    os: str
+    labels: list[str]
 
 
 class GitHubInstance:
@@ -42,8 +56,6 @@ class GitHubInstance:
     def __init__(self, token: str, repo: str):
         self.token = token
         self.headers = self._headers({})
-        auth = Auth.Token(token)
-        self.github = Github(auth=auth)
         self.repo = repo
 
     def _headers(self, header_kwargs):
@@ -83,7 +95,10 @@ class GitHubInstance:
                 f"Error in API call for {endpoint_url}: " f"{resp.content}"
             )
         else:
-            return resp.json()
+            try:
+                return resp.json()
+            except JSONDecodeError:
+                return resp.content
 
     def create_runner_tokens(self, count: int) -> list[str]:
         """Generate registration tokens for GitHub Actions runners.
@@ -149,46 +164,87 @@ class GitHubInstance:
         """
         return self._do_request(requests.post, endpoint, **kwargs)
 
-    def get_runner(self, label: str) -> SelfHostedActionsRunner | None:
-        """Retrieve a runner by its label.
+    def get(self, endpoint, **kwargs):
+        """Make a GET request to the GitHub API.
 
         Parameters
         ----------
-        label : str
-            The label of the runner to retrieve.
-
-        Returns
-        -------
-        SelfHostedActionsRunner | None
-            The runner object if found, otherwise None.
-
+        endpoint : str
+            The endpoint to make the request to.
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the request.
+            See the requests.get documentation for more information.
         """
-        runners = self.github.get_repo(self.repo).get_self_hosted_runners()
-        matched_runners = [
-            runner
-            for runner in runners
-            if label in [l["name"] for l in runner.labels()]
-        ]
-        return matched_runners[0] if matched_runners else None
+        return self._do_request(requests.get, endpoint, **kwargs)
 
-    def get_runners(self, label: str) -> list[SelfHostedActionsRunner] | None:
-        """Get runners by their label.
+    def delete(self, endpoint, **kwargs):
+        """Make a DELETE request to the GitHub API.
+
         Parameters
         ----------
-        label : str
-            The label of the runners to retrieve.
+        endpoint : str
+            The endpoint to make the request to.
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the request.
+            See the requests.delete documentation for more information.
+        """
+        return self._do_request(requests.delete, endpoint, **kwargs)
+
+    def get_runners(self) -> list[SelfHostedRunner] | None:
+        """Get a list of self-hosted runners in the repository.
+
         Returns
         -------
-        list[SelfHostedActionsRunner] | None
-            The list of runners if found, otherwise None.
+        list[SelfHostedRunner] | None
+            A list of self-hosted runners in the repository if they exist,
+            otherwise None.
+
+        Raises
+        ------
+        RunnerListError
+            If there is an error getting the list of runners. Either because of
+            an error in the request or the response is not a mapping object.
         """
-        runners = self.github.get_repo(self.repo).get_self_hosted_runners()
-        matched_runners = [
-            runner
-            for runner in runners
-            if label in [l["name"] for l in runner.labels()]
-        ]
-        return matched_runners if matched_runners else None
+        runners = []
+        try:
+            res = self.get(f"repos/{self.repo}/actions/runners")
+            # This allows for arbitrary mappable objects to be used
+            if not isinstance(res, collections.abc.Mapping):
+                # This could be related to the API or the request itself.
+                # ie the response is not a JSON object
+                raise RunnerListError(f"Did not receive mapping object: {res}")
+            for runner in res["runners"]:
+                id = runner["id"]
+                name = runner["name"]
+                os = runner["os"]
+                labels = [label["name"] for label in runner["labels"]]
+                runners.append(SelfHostedRunner(id, name, os, labels))
+            return runners if len(runners) > 0 else None
+        except RuntimeError as e:
+            # This occurs when we receive a status code is > 400
+            raise RunnerListError(f"Error getting runners: {e}")
+            # Other exceptions are bubbled up to the caller
+
+    def get_runner(self, label: str) -> SelfHostedRunner:
+        """Get a runner by a given label for a repository.
+
+        Returns
+        -------
+        SelfHostedRunner
+            The runner with the given label.
+
+        Raises
+        ------
+        MissingRunnerLabel
+            If the runner with the given label is not found.
+
+        """
+        runners = self.get_runners()
+        if runners is not None:
+            for runner in runners:
+                if label in runner.labels:
+                    return runner
+        raise MissingRunnerLabel(f"Runner {label} not found")
 
     def wait_for_runner(self, label: str, timeout: int, wait: int = 15):
         """Wait for the runner with the given label to be online.
@@ -214,52 +270,20 @@ class GitHubInstance:
 
     def remove_runner(self, label: str):
         """Remove a runner by a given label.
-
         Parameters
         ----------
         label : str
             The label of the runner to remove.
-
         Raises
         ------
         RuntimeError
             If there is an error removing the runner or the runner is not found.
-
         """
         runner = self.get_runner(label)
-        if runner is not None:
-            removed = self.github.get_repo(self.repo).remove_self_hosted_runner(
-                runner
-            )
-            if not removed:
-                raise RuntimeError(f"Error removing runner {label}")
-        else:
-            raise MissingRunnerLabel(f"Runner {label} not found")
-
-    def remove_runners(self, label: str):
-        """Remove runners by their label.
-
-        Parameters
-        ----------
-        label : str
-            The label of the runners to remove.
-
-        Raises
-        ------
-        RuntimeError
-            If there is an error removing the runners or the runners are not found.
-
-        """
-        runners = self.get_runners(label)
-        if runners is not None:
-            for runner in runners:
-                removed = self.github.get_repo(
-                    self.repo
-                ).remove_self_hosted_runner(runner)
-                if not removed:
-                    raise RuntimeError(f"Error removing runner {label}")
-        else:
-            raise MissingRunnerLabel(f"Runner {label} not found")
+        try:
+            self.delete(f"repos/{self.repo}/actions/runners/{runner.id}")
+        except Exception as e:
+            raise RuntimeError(f"Error removing runner {label}. Error: {e}")
 
     @staticmethod
     def generate_random_label() -> str:
@@ -276,6 +300,23 @@ class GitHubInstance:
         letters = string.ascii_lowercase + string.digits
         result_str = "".join(random.choice(letters) for i in range(8))
         return f"runner-{result_str}"
+
+    def _get_latest_release(self, repo: str) -> dict:
+        """Get the latest release for a repository.
+        Parameters
+        ----------
+        repo : str
+            The repository to get the latest release for.
+        Returns
+        -------
+        str
+            The tag name of the latest release.
+        """
+        try:
+            release = self.get(f"repos/{repo}/releases/latest")
+            return release
+        except Exception as e:
+            raise RuntimeError(f"Error getting latest release: {e}")
 
     def get_latest_runner_release(
         self, platform: str, architecture: str
@@ -314,11 +355,11 @@ class GitHubInstance:
                 f"Architecture '{architecture}' not supported for platform '{platform}'. "
                 f"Supported architectures are {supported_platforms[platform]}"
             )
-        release = self.github.get_repo(repo).get_latest_release()
-        assets = release.get_assets()
+        release = self._get_latest_release(repo)
+        assets = release["assets"]
         for asset in assets:
-            if platform in asset.name and architecture in asset.name:
-                return asset.browser_download_url
+            if platform in asset["name"] and architecture in asset["name"]:
+                return asset["browser_download_url"]
         raise RuntimeError(
             f"Runner release not found for platform {platform} and architecture {architecture}"
         )
