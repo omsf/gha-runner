@@ -114,7 +114,9 @@ def test_get_runners_no_json(github_instance):
         body="",
         status=200,
     )
-    with pytest.raises(RunnerListError, match="Did not receive mapping object: *"):
+    with pytest.raises(
+        RunnerListError, match="Did not receive mapping object: *"
+    ):
         github_instance.get_runners()
 
 
@@ -205,18 +207,56 @@ def test_get_latest_runner_release_invalid_arch(github_instance):
 @patch("time.sleep")  # Prevent actual sleeping in tests
 def test_wait_for_runner_success(mock_sleep, github_instance, mock_runner):
     with patch.object(
-        github_instance, "get_runner", side_effect=[None, mock_runner]
+        github_instance,
+        "get_runner",
+        side_effect=[
+            MissingRunnerLabel("First fail"),
+            MissingRunnerLabel("Second fail"),
+            mock_runner,
+        ],
     ):
-        github_instance.wait_for_runner("test-label", timeout=30)
+        runner = github_instance.wait_for_runner("test-label", timeout=30)
         assert mock_sleep.call_count == 1
+        assert runner == mock_runner
 
 
-@patch("time.sleep")
-@patch("time.time", side_effect=[0, 31])
+@patch("time.sleep")  # Prevent actual sleeping
+def test_wait_for_runner_already_exists(
+    mock_sleep, github_instance, mock_runner
+):
+    with patch.object(
+        github_instance,
+        "get_runner",
+        side_effect=[
+            mock_runner,
+        ],
+    ):
+        runner = github_instance.wait_for_runner("test-label", timeout=30)
+        assert mock_sleep.call_count == 0
+        assert runner == mock_runner
+
+
+@patch("time.sleep")  # Prevent actual sleeping in tests
+@patch("time.time")  # Control time for timeout logic
 def test_wait_for_runner_timeout(mock_time, mock_sleep, github_instance):
-    with patch.object(github_instance, "get_runner", return_value=None):
-        with pytest.raises(RuntimeError):
+    # Mock time.time() to first return 0, then return 31 (past the timeout)
+    mock_time.side_effect = [0, 29, 31]
+
+    with patch.object(
+        github_instance,
+        "get_runner",
+        side_effect=[
+            MissingRunnerLabel("Initial fail"),
+            MissingRunnerLabel("Fail after timeout"),
+        ],
+    ):
+        with pytest.raises(RuntimeError) as excinfo:
             github_instance.wait_for_runner("test-label", timeout=30)
+
+        assert "Timeout reached: Runner test-label not found" in str(
+            excinfo.value
+        )
+        assert mock_sleep.call_count == 1
 
 
 @responses.activate

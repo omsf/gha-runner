@@ -246,7 +246,9 @@ class GitHubInstance:
                     return runner
         raise MissingRunnerLabel(f"Runner {label} not found")
 
-    def wait_for_runner(self, label: str, timeout: int, wait: int = 15):
+    def wait_for_runner(
+        self, label: str, timeout: int, wait: int = 15
+    ) -> SelfHostedRunner:
         """Wait for the runner with the given label to be online.
 
         Parameters
@@ -257,16 +259,30 @@ class GitHubInstance:
             The time in seconds to wait between checks. Defaults to 15 seconds.
         timeout : int
             The maximum time in seconds to wait for the runner to be online.
+
+        Returns
+        -------
+        SelfHostedRunner
+            The runner with the given label.
+
         """
         max = time.time() + timeout
-        runner = self.get_runner(label)
-        while runner is None:
-            if time.time() > max:
-                raise RuntimeError(f"Timeout reached: Runner {label} not found")
-            print(f"Runner {label} not found. Waiting...")
+        try:
             runner = self.get_runner(label)
-            time.sleep(wait)
-        print(f"Runner {label} found!")
+            return runner
+        except MissingRunnerLabel:
+            print(f"Waiting for runner {label}...")
+            while True:
+                if time.time() > max:
+                    raise RuntimeError(
+                        f"Timeout reached: Runner {label} not found"
+                    )
+                try:
+                    runner = self.get_runner(label)
+                    return runner
+                except MissingRunnerLabel:
+                    print(f"Runner {label} not found. Waiting...")
+                    time.sleep(wait)
 
     def remove_runner(self, label: str):
         """Remove a runner by a given label.
