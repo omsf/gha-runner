@@ -1,12 +1,14 @@
 """Module to manage GitHub repository actions through the GitHub API."""
 
-from json import JSONDecodeError
-import urllib.parse
-from dataclasses import dataclass
-import requests
-import time
+import collections.abc
 import random
 import string
+import time
+import urllib.parse
+from dataclasses import dataclass
+from json import JSONDecodeError
+
+import requests
 
 
 class TokenRetrievalError(Exception):
@@ -189,11 +191,28 @@ class GitHubInstance:
         return self._do_request(requests.delete, endpoint, **kwargs)
 
     def get_runners(self) -> list[SelfHostedRunner] | None:
+        """Get a list of self-hosted runners in the repository.
+
+        Returns
+        -------
+        list[SelfHostedRunner] | None
+            A list of self-hosted runners in the repository if they exist,
+            otherwise None.
+
+        Raises
+        ------
+        RunnerListError
+            If there is an error getting the list of runners. Either because of
+            an error in the request or the response is not a mapping object.
+        """
         runners = []
         try:
             res = self.get(f"repos/{self.repo}/actions/runners")
-            if type(res) is not dict:
-                raise RunnerListError(f"Error getting runners: {res}")
+            # This allows for arbitrary mappable objects to be used
+            if not isinstance(res, collections.abc.Mapping):
+                # This could be related to the API or the request itself.
+                # ie the response is not a JSON object
+                raise RunnerListError(f"Did not receive mapping object: {res}")
             for runner in res["runners"]:
                 id = runner["id"]
                 name = runner["name"]
@@ -201,8 +220,10 @@ class GitHubInstance:
                 labels = [label["name"] for label in runner["labels"]]
                 runners.append(SelfHostedRunner(id, name, os, labels))
             return runners if len(runners) > 0 else None
-        except Exception as e:
+        except RuntimeError as e:
+            # This occurs when we receive a status code is > 400
             raise RunnerListError(f"Error getting runners: {e}")
+            # Other exceptions are bubbled up to the caller
 
     def get_runner(self, label: str) -> SelfHostedRunner:
         """Get a runner by a given label for a repository.
