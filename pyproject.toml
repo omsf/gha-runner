@@ -2,7 +2,7 @@
 name = "gha_runner"
 version = "0.3.0"
 description = "A GitHub Runner for deploying on cloud backends"
-authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }]
+authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }, {name = "David W.H. Swenson", email = "david.swenson@omsf.io"}]
 readme = "README.md"
 requires-python = ">= 3.11"
 dependencies = ["boto3", "requests"]
