@@ -11,6 +11,8 @@ def test_output(monkeypatch):
     with patch("builtins.open", mock_file):
         output("test_name", "test_value")
 
+    # Check that the file is opened and written to correctly
+    mock_file.assert_called_once_with("mock_output_file", "a")
     mock_file().write.assert_called_once_with("test_name=test_value\n")
 
 
