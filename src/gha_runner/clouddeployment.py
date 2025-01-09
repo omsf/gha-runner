@@ -217,7 +217,8 @@ class AWS(CloudDeployment):
                 "labels": labels,
             }
             params = self._build_aws_params(user_data_params)
-            params = self._modify_root_disk_size(ec2, params)
+            if self.root_device_size > 0:
+                params = self._modify_root_disk_size(ec2, params)
             result = ec2.run_instances(**params)
             instances = result["Instances"]
             id = instances[0]["InstanceId"]
