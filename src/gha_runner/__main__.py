@@ -24,6 +24,10 @@ def parse_aws_params() -> dict:
     instance_type = os.environ.get("INPUT_AWS_INSTANCE_TYPE")
     if instance_type is not None:
         params["instance_type"] = instance_type
+    root_device_size = os.environ.get("INPUT_AWS_ROOT_DEVICE_SIZE")
+    # We need to convert this to an integer, but it is not required to start
+    if root_device_size is not None and root_device_size != "":
+        params["root_device_size"] = int(root_device_size)
     params = _env_parse_helper(params, "INPUT_AWS_SUBNET_ID", "subnet_id")
     params = _env_parse_helper(
         params, "INPUT_AWS_SECURITY_GROUP_ID", "security_group_id"
