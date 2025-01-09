@@ -1,8 +1,10 @@
+from copy import deepcopy
 from abc import ABC, abstractmethod
 from gha_runner.gh import GitHubInstance
 from dataclasses import dataclass, field
 import importlib.resources
 import boto3
+from botocore.exceptions import ClientError
 from string import Template
 
 
@@ -93,6 +95,7 @@ class AWS(CloudDeployment):
     runner_release: str = ""
     tags: list[dict[str, str]] = field(default_factory=list)
     gh_runner_tokens: list[str] = field(default_factory=list)
+    root_device_size: int = 0
     labels: str = ""
     subnet_id: str = ""
     security_group_id: str = ""
@@ -134,6 +137,48 @@ class AWS(CloudDeployment):
 
         return params
 
+    def _modify_root_disk_size(self, client, params) -> dict:
+        """Modify the root disk size of the instance.
+
+        Parameters
+        ----------
+        client
+            The boto3 client to use for the API call.
+        params
+            The parameters for the create_instances AWS API call.
+
+        Returns
+        -------
+        dict
+            The modified parameters for the AWS API call.
+
+        Raises
+        ------
+        ClientError
+            If the user does not have permissions to describe images.
+
+        """
+        try:
+            # Check if we have permissions to describe images
+            client.describe_images(ImageIds=[self.image_id], DryRun=True)
+        except ClientError as e:
+            # This is the case where we do have permissions
+            if "DryRunOperation" in str(e):
+                image_options = client.describe_images(ImageIds=[self.image_id])
+                root_device_name = image_options["Images"][0]["RootDeviceName"]
+                block_devices = deepcopy(image_options["Images"][0]["BlockDeviceMappings"])
+                for idx, block_device in enumerate(block_devices):
+                    if block_device["DeviceName"] == root_device_name:
+                        if self.root_device_size > 0:
+                            block_devices[idx]["Ebs"]["VolumeSize"] = self.root_device_size
+                            params["BlockDeviceMappings"] = block_devices
+                        break
+            else:
+                # If not, we should receive an UnauthorizedOperation error
+                raise e
+        return params
+
+
     def create_instances(self) -> dict[str, str]:
         if not self.gh_runner_tokens:
             raise ValueError(
@@ -172,6 +217,8 @@ class AWS(CloudDeployment):
                 "labels": labels,
             }
             params = self._build_aws_params(user_data_params)
+            if self.root_device_size > 0:
+                params = self._modify_root_disk_size(ec2, params)
             result = ec2.run_instances(**params)
             instances = result["Instances"]
             id = instances[0]["InstanceId"]

@@ -16,6 +16,9 @@ inputs:
   aws_image_id:
     description: "The machine AMI to use for your runner. This AMI can be a default but should have docker installed in the AMI. Will not start if not specified."
     required: false
+  aws_root_device_size:
+    description: "The root device size in GB to use for your runner. Optional, defaults to the AMI default."
+    required: false
   aws_instance_type:
     description: "The type of instance to use for your runner. For example: t2.micro, t4g.nano, etc.. Will not start if not specified."
     required: false
