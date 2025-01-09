@@ -33,6 +33,7 @@ For more information see the [self-hosted runner security docs](https://docs.git
 | aws_image_id          | The machine AMI to use for your runner. This AMI can be a default but should have docker installed in the AMI.     | true               |         |
 | aws_instance_type     | The type of instance to use for your runner. For example: t2.micro, t4g.nano, etc. Will not start if not specified.| true               |         |
 | aws_region_name       | The AWS region name to use for your runner. Will not start if not specified.                                       | true               |         |
+| aws_root_device_size  | The root device size in GB to use for your runner.                                                                 | false              | The default AMI root device size |
 | aws_security_group_id | The AWS security group ID to use for your runner. Will use the account default security group if not specified.    | false              | The default AWS security group |
 | aws_subnet_id         | The AWS subnet ID to use for your runner. Will use the account default subnet if not specified.                    | false              | The default AWS subnet ID |
 | aws_tags              | The AWS tags to use for your runner, formatted as a JSON list. See `README` for more details.                      | false              |         |
