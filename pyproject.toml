@@ -1,6 +1,6 @@
 [project]
 name = "gha_runner"
-version = "0.3.0"
+version = "0.4.0"
 description = "A GitHub Runner for deploying on cloud backends"
 authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }, {name = "David W.H. Swenson", email = "david.swenson@omsf.io"}]
 readme = "README.md"
