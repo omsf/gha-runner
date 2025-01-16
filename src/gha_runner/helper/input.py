@@ -40,6 +40,18 @@ class EnvVarBuilder:
     This class provides a fluent interface for parsing and transforming environment variables
     into a structured dictionary, with support for JSON parsing and type conversion.
 
+    Attributes
+    ----------
+    env : Dict[str, str]
+        The environment variables.
+    params : dict
+        The dictionary of parsed parameters.
+
+    Parameters
+    ----------
+    env: Dict[str, str]
+        The environment variables.
+
     Examples
     --------
     >>> env = {"MY_VAR": "123", "JSON_VAR": '{"key": "value"}'}
@@ -50,14 +62,6 @@ class EnvVarBuilder:
     ...     .build())
     >>> # result = {"my_key": 123, "json_key": {"key": "value"}}
 
-    Methods
-    -------
-    with_var(var_name: str, key: str, is_json: bool = False,
-            allow_empty: bool = False, type_hint: Type = str) -> EnvVarBuilder:
-        Adds an environment variable to be parsed with specified configuration.
-    build() -> dict:
-        Builds and returns the final dictionary of parsed parameters.
-
     Notes
     -----
     - The builder creates deep copies of values to prevent mutation
@@ -67,16 +71,6 @@ class EnvVarBuilder:
     """
 
     def __init__(self, env: Dict[str, str]):
-        """Initialize the builder.
-
-        The builder is initialized with the environment variables as a dict.
-
-        Parameters
-        ----------
-        env : Dict[str, str]
-            The environment variables.
-
-        """
         self.env = env
         self.params = {}
 
@@ -129,7 +123,7 @@ class EnvVarBuilder:
         self.params = deepcopy(self.params)
         self.params[key] = deepcopy(value)
 
-    def with_var(
+    def with_state(
         self,
         var_name: str,
         key: str,

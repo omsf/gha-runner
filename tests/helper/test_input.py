@@ -19,15 +19,15 @@ def test_parse_params_empty():
     env["INPUT_AWS_LABELS"] = ""
     params = (
         EnvVarBuilder(env)
-        .with_var("INPUT_AWS_IMAGE_ID", "image_id", allow_empty=True)
-        .with_var("INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True)
-        .with_var("INPUT_AWS_SUBNET_ID", "subnet_id")
-        .with_var("INPUT_AWS_SECURITY_GROUP_ID", "security_group_id")
-        .with_var("INPUT_AWS_IAM_ROLE", "iam_role")
-        .with_var("INPUT_AWS_TAGS", "tags", is_json=True)
-        .with_var("INPUT_AWS_REGION_NAME", "region_name", allow_empty=True)
-        .with_var("INPUT_AWS_HOME_DIR", "home_dir", allow_empty=True)
-        .with_var("INPUT_AWS_LABELS", "labels")
+        .with_state("INPUT_AWS_IMAGE_ID", "image_id", allow_empty=True)
+        .with_state("INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True)
+        .with_state("INPUT_AWS_SUBNET_ID", "subnet_id")
+        .with_state("INPUT_AWS_SECURITY_GROUP_ID", "security_group_id")
+        .with_state("INPUT_AWS_IAM_ROLE", "iam_role")
+        .with_state("INPUT_AWS_TAGS", "tags", is_json=True)
+        .with_state("INPUT_AWS_REGION_NAME", "region_name", allow_empty=True)
+        .with_state("INPUT_AWS_HOME_DIR", "home_dir", allow_empty=True)
+        .with_state("INPUT_AWS_LABELS", "labels")
         .build()
     )
 
@@ -49,12 +49,12 @@ def test_env_builder():
     env["INPUT_AWS_TAGS"] = '{"Key": "Name", "Value": "test"}'
     config = (
         EnvVarBuilder(env)
-        .with_var("INPUT_AWS_IMAGE_ID", "image_id")
-        .with_var("INPUT_AWS_INSTANCE_TYPE", "instance_type")
-        .with_var("GITHUB_REPOSITORY", "repo")
-        .with_var("INPUT_GH_REPO", "repo")
-        .with_var("INPUT_INSTANCE_COUNT", "instance_count", type_hint=int)
-        .with_var("INPUT_AWS_TAGS", "tags", is_json=True)
+        .with_state("INPUT_AWS_IMAGE_ID", "image_id")
+        .with_state("INPUT_AWS_INSTANCE_TYPE", "instance_type")
+        .with_state("GITHUB_REPOSITORY", "repo")
+        .with_state("INPUT_GH_REPO", "repo")
+        .with_state("INPUT_INSTANCE_COUNT", "instance_count", type_hint=int)
+        .with_state("INPUT_AWS_TAGS", "tags", is_json=True)
         .build()
     )
     assert config["image_id"] == "ami-1234567890"
