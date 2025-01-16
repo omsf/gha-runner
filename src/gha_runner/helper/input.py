@@ -72,7 +72,7 @@ class EnvVarBuilder:
 
     def __init__(self, env: Dict[str, str]):
         self.env = env
-        self.params = {}
+        self._params = {}
 
     def parse_value(
         self, value: str, is_json: bool, type_hint: Optional[Type]
@@ -120,8 +120,8 @@ class EnvVarBuilder:
             self._update_params(config.key, parsed_value)
 
     def _update_params(self, key: str, value: Any):
-        self.params = deepcopy(self.params)
-        self.params[key] = deepcopy(value)
+        self._params = deepcopy(self._params)
+        self._params[key] = deepcopy(value)
 
     def with_state(
         self,
@@ -154,13 +154,7 @@ class EnvVarBuilder:
         self.parse_single_param(config)
         return self
 
-    def build(self) -> dict:
-        """Build and return the final dictionary of parsed parameters.
-
-        Returns
-        -------
-        dict
-            Dictionary containing all parsed and transformed environment variables.
-
-        """
-        return self.params
+    @property
+    def params(self) -> dict:
+        """Returns a copyt of the dictionary of parsed parameters."""
+        return deepcopy(self._params)

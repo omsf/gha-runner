@@ -17,7 +17,7 @@ def test_parse_params_empty():
     env["INPUT_AWS_REGION_NAME"] = ""
     env["INPUT_AWS_HOME_DIR"] = ""
     env["INPUT_AWS_LABELS"] = ""
-    params = (
+    builder = (
         EnvVarBuilder(env)
         .with_state("INPUT_AWS_IMAGE_ID", "image_id", allow_empty=True)
         .with_state("INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True)
@@ -28,8 +28,8 @@ def test_parse_params_empty():
         .with_state("INPUT_AWS_REGION_NAME", "region_name", allow_empty=True)
         .with_state("INPUT_AWS_HOME_DIR", "home_dir", allow_empty=True)
         .with_state("INPUT_AWS_LABELS", "labels")
-        .build()
     )
+    params = builder.params
 
     assert params == {
         "image_id": "",
@@ -47,7 +47,7 @@ def test_env_builder():
     env["GITHUB_REPOSITORY"] = "owner/test_other"
     env["INPUT_INSTANCE_COUNT"] = "1"
     env["INPUT_AWS_TAGS"] = '{"Key": "Name", "Value": "test"}'
-    config = (
+    builder = (
         EnvVarBuilder(env)
         .with_state("INPUT_AWS_IMAGE_ID", "image_id")
         .with_state("INPUT_AWS_INSTANCE_TYPE", "instance_type")
@@ -55,8 +55,8 @@ def test_env_builder():
         .with_state("INPUT_GH_REPO", "repo")
         .with_state("INPUT_INSTANCE_COUNT", "instance_count", type_hint=int)
         .with_state("INPUT_AWS_TAGS", "tags", is_json=True)
-        .build()
     )
+    config = builder.params
     assert config["image_id"] == "ami-1234567890"
     assert config["instance_type"] == "t2.micro"
     assert config["repo"] == "owner/test"
