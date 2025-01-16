@@ -74,7 +74,7 @@ class EnvVarBuilder:
         self.env = env
         self._params = {}
 
-    def parse_value(
+    def _parse_value(
         self, value: str, is_json: bool, type_hint: Optional[Type]
     ) -> Any:
         """Parse the value based on the configuration.
@@ -92,13 +92,8 @@ class EnvVarBuilder:
 
         Returns
         -------
-        EnvVarBuilder
-            Returns self for method chaining
-
-        Raises
-        ------
-        ValueError
-            If the environment variable cannot be parsed according to specifications
+        Any
+            The parsed value as the specified type or JSON object
 
         Notes
         -----
@@ -110,11 +105,11 @@ class EnvVarBuilder:
         if type_hint is not None:
             return type_hint(value)
 
-    def parse_single_param(self, config: ParamConfig):
+    def _parse_single_param(self, config: ParamConfig):
         """Parse a single parameter from the environment variables."""
         value = self.env.get(config.env_var)
         if value is not None and (config.allow_empty or value.strip()):
-            parsed_value = self.parse_value(
+            parsed_value = self._parse_value(
                 value, config.is_json, config.type_val
             )
             self._update_params(config.key, parsed_value)
@@ -131,12 +126,12 @@ class EnvVarBuilder:
         allow_empty: bool = False,
         type_hint: Type = str,
     ) -> "EnvVarBuilder":
-        """Build and return the final dictionary of parsed parameters.
+        """Update the state of the builder with a single parameter.
 
         Returns
         -------
-        dict
-            Dictionary containing all parsed and transformed environment variables
+        EnvVarBuilder
+            Returns self for method chaining
 
         Raises
         ------
@@ -151,7 +146,7 @@ class EnvVarBuilder:
         """
         config = ParamConfig(var_name, key, is_json, allow_empty, type_hint)
 
-        self.parse_single_param(config)
+        self._parse_single_param(config)
         return self
 
     @property
