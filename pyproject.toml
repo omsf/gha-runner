@@ -1,11 +1,12 @@
 [project]
 name = "gha_runner"
-version = "0.4.0"
 description = "A GitHub Runner for deploying on cloud backends"
 authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }, {name = "David W.H. Swenson", email = "david.swenson@omsf.io"}]
 readme = "README.md"
 requires-python = ">= 3.11"
 dependencies = ["boto3", "requests"]
+license.file = "LICENSE"
+dynamic = ["version"]
 
 [project.optional-dependencies]
 test = [
@@ -15,9 +16,13 @@ test = [
     "responses"
 ]
 
+
+
 [build-system]
-# We are not going to add versioningit at this time
-requires = ["setuptools >= 61.2"]
+requires = [
+    "setuptools >= 61.2",
+    "versioningit"
+]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -25,6 +30,9 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 gha_runner = ["*.templ", "templates/*.templ"]
+
+[tool.versioningit]
+pep440 = true
 
 [tool.coverage.report]
 exclude_also = ["raise NotImplementedError"]
