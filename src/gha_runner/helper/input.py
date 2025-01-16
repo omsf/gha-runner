@@ -123,7 +123,7 @@ class EnvVarBuilder:
         self._params = deepcopy(self._params)
         self._params[key] = deepcopy(value)
 
-    def with_state(
+    def update_state(
         self,
         var_name: str,
         key: str,
