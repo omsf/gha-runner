@@ -15,6 +15,10 @@ test = [
     "moto[ec2]",
     "responses"
 ]
+convert = [
+    "ruamel.yaml",
+    "click",
+]
 
 
 
@@ -27,6 +31,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["gha_runner", "gha_runner_convert"]
 
 [tool.setuptools.package-data]
 gha_runner = ["*.templ", "templates/*.templ"]
