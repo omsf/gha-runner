@@ -30,14 +30,30 @@ jobs:
         with:
           name: gha-runner-dists
           path: dist/
-  publish-to-test-pypi:
-    name: Publish distribution
+      - name: Determine release type
+        id: release-type
+        run: |
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            echo "repository_url=https://test.pypi.org/legacy/" | tee -a "$GITHUB_OUTPUT"
+            echo "verbose=true" | tee -a "$GITHUB_OUTPUT"
+            echo "environment_name=testpypi" | tee -a "$GITHUB_OUTPUT"
+            echo "environment_url=https://test.pypi.org/p/gha_runner"
+          else
+            echo "repository_url=https://upload.pypi.org/legacy/" | tee -a "$GITHUB_OUTPUT"
+            echo "verbose=false" | tee -a "$GITHUB_OUTPUT"
+            echo "environment_name=pypi" | tee -a "$GITHUB_OUTPUT"
+            echo "environment_url=https://pypi.org/p/gha_runner" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+
+  publish:
+    name: Publish distribution to ${{ needs.build.outputs.environment_name }}
     needs:
       - build
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/gha_runner
+      name: ${{ needs.build.outputs.environment_name }}
+      url: ${{ needs.build.outputs.enviuronment_url }}
     permissions:
       id-token: write
     steps:
@@ -46,8 +62,8 @@ jobs:
         with:
           name: gha-runner-dists
           path: dist/
-      - name: Publish to TestPyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-url: https://test.pypi.org/legacy/
-          verbose: true
+          repository-url: ${{ needs.build.outputs.repository_url }}
+          verbose: ${{ needs.build.outputs.verbose }}
