@@ -57,13 +57,15 @@ jobs:
     permissions:
       id-token: write
     steps:
+      - name: Debug outputs
+        run: echo '${{ toJSON(needs.build.outputs )}}'
       - name: Download the dists
         uses: actions/download-artifact@v4
         with:
           name: gha-runner-dists
           path: dist/
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: ${{ needs.build.outputs.repository_url }}
-          verbose: ${{ needs.build.outputs.verbose }}
+      # - name: Publish to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     repository-url: ${{ needs.build.outputs.repository_url }}
+      #     verbose: ${{ needs.build.outputs.verbose }}
