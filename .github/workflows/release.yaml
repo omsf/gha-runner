@@ -42,7 +42,7 @@ jobs:
             echo "repository_url=https://test.pypi.org/legacy/" | tee -a "$GITHUB_OUTPUT"
             echo "verbose=true" | tee -a "$GITHUB_OUTPUT"
             echo "environment_name=testpypi" | tee -a "$GITHUB_OUTPUT"
-            echo "environment_url=https://test.pypi.org/p/gha_runner"
+            echo "environment_url=https://test.pypi.org/p/gha_runner" | tee -a "$GITHUB_OUTPUT"
           else
             echo "repository_url=https://upload.pypi.org/legacy/" | tee -a "$GITHUB_OUTPUT"
             echo "verbose=false" | tee -a "$GITHUB_OUTPUT"
@@ -68,8 +68,8 @@ jobs:
         with:
           name: gha-runner-dists
           path: dist/
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     repository-url: ${{ needs.build.outputs.repository_url }}
-      #     verbose: ${{ needs.build.outputs.verbose }}
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: ${{ needs.build.outputs.repository_url }}
+          verbose: ${{ needs.build.outputs.verbose }}
