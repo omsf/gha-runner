@@ -8,6 +8,11 @@ jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
+    outputs:
+      repository_url: ${{ steps.release-type.outputs.repository_url }}
+      verbose: ${{ steps.release-type.outputs.verbose }}
+      environment_name: ${{ steps.release-type.outputs.environment_name }}
+      environment_url: ${{ steps.release-type.outputs.environment_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,12 +53,11 @@ jobs:
 
   publish:
     name: Publish distribution to ${{ needs.build.outputs.environment_name }}
-    needs:
-      - build
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: ${{ needs.build.outputs.environment_name }}
-      url: ${{ needs.build.outputs.enviuronment_url }}
+      url: ${{ needs.build.outputs.environment_url }}
     permissions:
       id-token: write
     steps:
