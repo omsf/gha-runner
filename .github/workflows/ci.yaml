@@ -13,6 +13,8 @@ on:
       - ".github/**"
       - "docs/**"
       - "README.md"
+  schedule:
+    - cron: "0 13 * * 1" # 1300 UTC on Mondays
   workflow_dispatch:
 
 jobs:
