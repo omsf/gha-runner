@@ -1,7 +1,10 @@
 [project]
 name = "gha_runner"
 description = "A GitHub Runner for deploying on cloud backends"
-authors = [{ name = "Ethan Holz", email = "ethan.holz@omsf.io" }, {name = "David W.H. Swenson", email = "david.swenson@omsf.io"}]
+authors = [
+    { name = "Ethan Holz", email = "ethan.holz@omsf.io" },
+    { name = "David W.H. Swenson", email = "david.swenson@omsf.io" },
+]
 readme = "README.md"
 requires-python = ">= 3.11"
 dependencies = ["boto3", "requests"]
@@ -9,20 +12,12 @@ license.file = "LICENSE"
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov",
-    "moto[ec2]",
-    "responses"
-]
-
+test = ["pytest", "pytest-cov", "moto[ec2]", "responses"]
+docs = ["mkdocs", "mkdocstrings[python]"]
 
 
 [build-system]
-requires = [
-    "setuptools >= 61.2",
-    "versioningit"
-]
+requires = ["setuptools >= 61.2", "versioningit"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -38,11 +33,13 @@ pep440 = true
 exclude_also = ["raise NotImplementedError"]
 
 [tool.pytest.ini_options]
-markers = ["slow: marks test as slow","main: marks the test for the main module"]
+markers = [
+    "slow: marks test as slow",
+    "main: marks the test for the main module",
+]
 
 [tool.ruff]
 line-length = 80
 
 [tool.ruff.lint]
 select = ["F", "E", "N"]
-
