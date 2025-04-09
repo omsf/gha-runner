@@ -10,6 +10,8 @@ nav:
           - Helpers:
               - Workflow Commands: api/helper/workflow_cmds.md
               - Input: api/helper/input.md
+exclude_docs: |
+  README.md
 theme: readthedocs
 plugins:
   - mkdocstrings:
