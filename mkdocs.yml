@@ -1,0 +1,56 @@
+site_name: gha-runner
+site_url: ""
+nav:
+  - Home: index.md
+  - Implementations:
+      - AWS: aws.md
+  - API Reference:
+      - Modules:
+          - Cloud Deployment: api/clouddeployment.md
+          - GitHub Interactions: api/gh.md
+          - Helpers:
+              - Workflow Commands: api/helper/workflow_cmds.md
+              - Input: api/helper/input.md
+exclude_docs: |
+  README.md
+theme: readthedocs
+plugins:
+  - llmstxt:
+      markdown_description: A library for creating ephemeral GitHub Actions runners in Python.
+      full_output: llms-full.txt
+      sections:
+        Overview and Getting Started:
+          - index.md
+        Implementations:
+          - aws.md
+        API Reference:
+          - api/*.md
+
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            filters:
+              - "!^_"
+            # Docstring style selection
+            docstring_style: numpy # You can change this to 'numpy', 'sphinx', or 'restructuredtext'
+
+            # Heading/Section Options
+            show_root_heading: true
+            show_root_full_path: false
+            heading_level: 1
+
+            # Members Options
+            show_if_no_docstring: false
+            show_source: true
+            show_bases: true
+
+            # Signature Options
+            show_signature: true
+            show_signature_annotations: true
+
+            # Additional Options
+            separate_signature: true
+            line_length: 88
+            inherited_members: false

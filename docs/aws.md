@@ -5,72 +5,72 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
 - An AWS account
 
 ## Setup
-1. Set up the OpenID Connect (OIDC) Provider
-    1. Sign into your AWS Management Console.
-    2. Go to the IAM Console.
-    3. In the navigation pane, choose "Identity Provider".
-    4. Click "Add Provider".
-    5. Select "OpenID Connect" and add the following
-        - Provider URL - `https://token.actions.githubusercontent.com`
-        - Audience - `sts.amazonaws.com`
-    6. Click "Add Provider" at the bottom of the page to assign it.
-2. Prepare a Policy
-    1. Sign in to your AWS Management Console.
-    2. Go to the IAM console.
-    3. In the navigation pane, choose "Policies" and click "Create Policy".
-    4. Select the "JSON" tab, paste the following JSON, and click "Next":
-        ```json
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ec2:RunInstances",
-                "ec2:TerminateInstances",
-                "ec2:DescribeInstances",
-                "ec2:DescribeInstanceStatus",
-                "ec2:DescribeImages"
-              ],
-              "Resource": "*"
-            }
-          ]
-        }
-        ```
-    5. Name the policy (e.g., `gha-runner-policy`) and click "Create Policy".
-3. Create an IAM role
-    1. Sign into your AWS Management Console.
-    2. Go to the IAM Console.
-    3. In the navigation pane, select "Roles" and then click "Create Role".
-    4. Select "Web Identity" for the trusted entity type.
-    5. Set your identity provider to "tokens.actions.githubusercontent.com"
-    6. Set the audience to `sts.amazonaws.com`
-    7. Set your GitHub auth rules:
-        - GitHub organization - This would be your org or username for example, `omsf-eco-infra`. This limits it so that credentials are only given to this organization.
-        - GitHub repository - This would limit the scope of this authentication to a given repo. You may choose to set or extend this in the future.
-        - GitHub branch - This further restricts usage to a single branch.
-    8. Click "Next".
-    9. Now find and select the policy created earlier (if you used above, this would be `gha-runner-policy`) and then click "Next".
-    10. Add a role name and optionally description, then click "Create Role".
-    11. Select your newly named role and copy the ARN, we will use this later.
-4. Create your GitHub Access Token
-    1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
-    2. Go to your GitHub account settings.
-    3. Click on "Developer settings".
-    4. In the "Tokens (classic)" menu, create a new token with `repo` scope.
-    5. Save and/or copy the token.
-5. Add your credentials to your repository secrets
-    1. Go to your repository on GitHub.
-    2. Click on "Settings", then "Secrets and Variables", and then "Actions".
-    3. Click "New repository secret".
-    4. Add the following secrets:
-      - `GH_PAT` - The GitHub token you copied earlier.
-6. Choose an (or create) an AMI
-    - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
-    - To find an AMI, we recommend using the following [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) to find AMIs in the AWS console. The easiest way to do this is by trying to create an instance and copying the AMI ID you want to use. To note, if you end in the AWS Marketplace, you have probably gone too far.
-    - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
-    - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
-    - Please see below for more information on recommendations for GPU instances
+### Set up the OpenID Connect (OIDC) Provider
+  1. Sign into your AWS Management Console.
+  2. Go to the IAM Console.
+  3. In the navigation pane, choose "Identity Provider".
+  4. Click "Add Provider".
+  5. Select "OpenID Connect" and add the following
+      - Provider URL - `https://token.actions.githubusercontent.com`
+      - Audience - `sts.amazonaws.com`
+  6. Click "Add Provider" at the bottom of the page to assign it.
+### Prepare a Policy
+  1. Sign in to your AWS Management Console.
+  2. Go to the IAM console.
+  3. In the navigation pane, choose "Policies" and click "Create Policy".
+  4. Select the "JSON" tab, paste the JSON found below, and click "Next".
+  5. Name the policy whatever you'd like (e.g. `gha-runner-policy`)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeImages"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+### Create an IAM role
+  1. Sign into your AWS Management Console.
+  2. Go to the IAM Console.
+  3. In the navigation pane, select "Roles" and then click "Create Role".
+  4. Select "Web Identity" for the trusted entity type.
+  5. Set your identity provider to "tokens.actions.githubusercontent.com"
+  6. Set the audience to `sts.amazonaws.com`
+  7. Set your GitHub auth rules:
+      - GitHub organization - This would be your org or username for example, `omsf-eco-infra`. This limits it so that credentials are only given to this organization.
+      - GitHub repository - This would limit the scope of this authentication to a given repo. You may choose to set or extend this in the future.
+      - GitHub branch - This further restricts usage to a single branch.
+  8. Click "Next".
+  9. Now find and select the policy created earlier (if you used above, this would be `gha-runner-policy`) and then click "Next".
+  10. Add a role name and optionally description, then click "Create Role".
+  11. Select your newly named role and copy the ARN, we will use this later.
+### Create your GitHub Access Token
+  1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
+  2. Go to your GitHub account settings.
+  3. Click on "Developer settings".
+  4. In the "Tokens (classic)" menu, create a new token with `repo` scope.
+  5. Save and/or copy the token.
+### Add your credentials to your repository secrets
+  1. Go to your repository on GitHub.
+  2. Click on "Settings", then "Secrets and Variables", and then "Actions".
+  3. Click "New repository secret".
+  4. Add the following secrets:
+    - `GH_PAT` - The GitHub token you copied earlier.
+### Choose an (or create) an AMI
+  - We recommend Ubuntu 22.04 to stay in-line with [GitHub Actions](https://github.com/actions/runner-images#available-images)
+  - To find an AMI, we recommend using the following [AWS documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html) to find AMIs in the AWS console. The easiest way to do this is by trying to create an instance and copying the AMI ID you want to use. To note, if you end in the AWS Marketplace, you have probably gone too far.
+  - To ensure compatibility, ensure that `docker` and `git` are installed on this machine
+  - To create your own AMI please review these [AWS docs](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html)
+  - Please see below for more information on recommendations for GPU instances
 
 **NOTE**: If you are already using AWS for EC2, you may consider creating a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html), [subnet](https://docs.aws.amazon.com/vpc/latest/userguide/create-subnets.html), and a [security group](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-groups.html) with outbound traffic on port 443 to isolate your runners from the rest of your AWS account.
 
