@@ -1,4 +1,5 @@
 site_name: gha-runner
+site_url: ""
 nav:
   - Home: index.md
   - Implementations:
@@ -14,6 +15,17 @@ exclude_docs: |
   README.md
 theme: readthedocs
 plugins:
+  - llmstxt:
+      markdown_description: A library for creating ephemeral GitHub Actions runners in Python.
+      full_output: llms-full.txt
+      sections:
+        Overview and Getting Started:
+          - index.md
+        Implementations:
+          - aws.md
+        API Reference:
+          - api/*.md
+
   - mkdocstrings:
       default_handler: python
       handlers:
