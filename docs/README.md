@@ -1,4 +1,4 @@
-This project us `mkdoc` to for building API documentation.
+This project uses `mkdocs` for building API documentation.
 To get started with editing these docs run the following:
 
 ```bash

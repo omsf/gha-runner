@@ -23,7 +23,7 @@ jobs:
         run: |
           python -m mkdocs build --strict
 
-      - name: Create artifiact
+      - name: Create artifact
         shell: bash
         run: tar czvf site.tar.gz site
 
@@ -33,4 +33,4 @@ jobs:
           name: site-build
           path: site.tar.gz
           if-no-found-files: error
-          retrention-days: 1
+          retention-days: 1
