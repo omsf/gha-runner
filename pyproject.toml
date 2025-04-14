@@ -7,13 +7,14 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
-dependencies = ["boto3", "requests"]
+dependencies = ["requests"]
 license.file = "LICENSE"
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "moto[ec2]", "responses"]
+test = ["pytest", "pytest-cov", "responses"]
 docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-llmstxt"]
+
 
 
 [build-system]
