@@ -31,9 +31,9 @@ jobs:
         run: tar czvf site.tar.gz site
 
       - name: Upload artifact
-        uses: actions/upload-artifacts@v4
+        uses: actions/upload-artifact@v4
         with:
           name: site-build
           path: site.tar.gz
-          if-no-found-files: error
+          if-no-files-found: error
           retention-days: 1
