@@ -13,6 +13,8 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "responses"]
+docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-llmstxt"]
+
 
 
 [build-system]
