@@ -1,5 +1,6 @@
 # gha-runner
 ![PyPI - Version](https://img.shields.io/pypi/v/gha-runner)
+
 A simple library for building infrastructure provisioning GitHub Actions via Docker in Python. This project provides scaffolds for starting and stopping cloud instances and all the required interactions to register with the GitHub API. Additionally, we provide some helper functions for environment variable parsing and GitHub Actions native logging.
 
 ## Implementations
