@@ -170,3 +170,7 @@ pyrightconfig.json
 
 # act ignore
 .secrets
+
+# pixi environments
+.pixi
+*.egg-info
