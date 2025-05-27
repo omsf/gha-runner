@@ -75,7 +75,7 @@ def test_create_runner_tokens(github_instance):
 def test_get_runners(github_instance):
     responses.add(
         responses.GET,
-        "https://api.github.com/repos/test/test/actions/runners",
+        "https://api.github.com/repos/test/test/actions/runners?per_page=30&page=1",
         json={
             "total_count": 1,
             "runners": [
@@ -100,7 +100,7 @@ def test_get_runners(github_instance):
 def test_get_runners_empty(github_instance):
     responses.add(
         responses.GET,
-        "https://api.github.com/repos/test/test/actions/runners",
+        "https://api.github.com/repos/test/test/actions/runners?per_page=30&page=1",
         json={
             "total_count": 0,
             "runners": [],
@@ -133,6 +133,62 @@ def test_get_runners_error(github_instance):
     )
     with pytest.raises(RunnerListError, match="Error getting runners: *"):
         github_instance.get_runners()
+
+
+@responses.activate
+def test_get_runners_pagination(github_instance):
+    # Mock first page (30 runners)
+    page1_runners = []
+    for i in range(1, 31):
+        page1_runners.append(
+            {
+                "id": i,
+                "name": f"test-runner-{i}",
+                "os": "linux",
+                "labels": [{"name": f"test-label-{i}"}],
+            }
+        )
+
+    responses.add(
+        responses.GET,
+        "https://api.github.com/repos/test/test/actions/runners?per_page=30&page=1",
+        json={
+            "total_count": 31,
+            "runners": page1_runners,
+        },
+        status=200,
+    )
+
+    # Mock second page (20 runners)
+    page2_runners = []
+    for i in range(31, 51):
+        page2_runners.append(
+            {
+                "id": i,
+                "name": f"test-runner-{i}",
+                "os": "linux",
+                "labels": [{"name": f"test-label-{i}"}],
+            }
+        )
+
+    responses.add(
+        responses.GET,
+        "https://api.github.com/repos/test/test/actions/runners?per_page=30&page=2",
+        json={
+            "total_count": 50,
+            "runners": page2_runners,
+        },
+        status=200,
+    )
+
+    runners = github_instance.get_runners()
+    assert len(runners) == 50
+    assert runners[0].id == 1
+    assert runners[0].name == "test-runner-1"
+    assert runners[29].id == 30
+    assert runners[30].id == 31
+    assert runners[49].id == 50
+    assert runners[49].name == "test-runner-50"
 
 
 def test_get_runner_by_label(github_instance, mock_runner):
