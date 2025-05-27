@@ -77,6 +77,7 @@ def test_get_runners(github_instance):
         responses.GET,
         "https://api.github.com/repos/test/test/actions/runners",
         json={
+            "total_count": 1,
             "runners": [
                 {
                     "id": 1,
@@ -84,7 +85,7 @@ def test_get_runners(github_instance):
                     "os": "linux",
                     "labels": [{"name": "test-label"}],
                 }
-            ]
+            ],
         },
         status=200,
     )
@@ -100,7 +101,10 @@ def test_get_runners_empty(github_instance):
     responses.add(
         responses.GET,
         "https://api.github.com/repos/test/test/actions/runners",
-        json={"runners": []},
+        json={
+            "total_count": 0,
+            "runners": [],
+        },
         status=200,
     )
     assert github_instance.get_runners() is None
