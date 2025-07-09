@@ -36,6 +36,7 @@ class MockStopCloudInstance(StopCloudInstance):
     def wait_until_removed(self, ids, **kwargs):
         pass
 
+
 class MockFailableWaitStop(StopCloudInstance):
     def __init__(self):
         self.instances = {"i-123": "runner-1"}
@@ -73,7 +74,9 @@ def deploy_instance(gh_mock):
 def test_deploy_instance_creation(deploy_instance, gh_mock):
     assert isinstance(deploy_instance.provider, MockStartCloudInstance)
     gh_mock.create_runner_tokens.assert_called_once_with(1)
-    gh_mock.get_latest_runner_release.assert_called_once()
+    gh_mock.get_latest_runner_release.assert_called_once_with(
+        platform="linux", architecture="x64"
+    )
 
 
 def test_deploy_instance_start_runners(deploy_instance, gh_mock):
@@ -127,16 +130,18 @@ def test_teardown_instance_failure(gh_mock, capsys):
     teardown.stop_runner_instances()
     captured = capsys.readouterr()
     catpured_output = captured.out
-    expected_output = ["Shutting down...",
+    expected_output = [
+        "Shutting down...",
         "Removing GitHub Actions Runner",
         "Removing runner runner-1",
         "::warning title=Failed to remove runner::Testing",
         "Removing instances...",
         "Waiting for instance to be removed...",
-        "Instances removed!"
+        "Instances removed!",
     ]
     actual_output = catpured_output.strip().split("\n")
     assert actual_output == expected_output
+
 
 def test_teardown_instance_failed_wait(gh_mock, capsys):
     with pytest.raises(SystemExit) as exit_info:
