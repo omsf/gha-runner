@@ -43,7 +43,7 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
   2. Go to the IAM Console.
   3. In the navigation pane, select "Roles" and then click "Create Role".
   4. Select "Web Identity" for the trusted entity type.
-  5. Set your identity provider to "tokens.actions.githubusercontent.com"
+  5. Set your identity provider to "token.actions.githubusercontent.com"
   6. Set the audience to `sts.amazonaws.com`
   7. Set your GitHub auth rules:
       - GitHub organization - This would be your org or username for example, `omsf-eco-infra`. This limits it so that credentials are only given to this organization.
