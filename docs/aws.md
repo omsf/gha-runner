@@ -145,6 +145,19 @@ jobs:
           instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+  notify_failure:
+    needs: [inference-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    if: always() && (needs.stop-aws-runner.result == 'failure')
+    steps:
+      - name: Create issue
+        # Customize this to your liking, add assignees if needed
+        run: 'gh issue create --title "AWS job failed to stop correctly" --body "Job failed, please check AWS for running instances." -R omsf-eco-infra/openmm-gpu-test'
+        env:
+          GH_TOKEN: ${{ github.token }}
 
 ```
 
