@@ -146,7 +146,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
   notify_failure:
-    needs: [inference-test]
+    needs: [self-hosted-test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
