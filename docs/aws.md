@@ -119,7 +119,7 @@ jobs:
     needs:
       - start-aws-runner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Print disk usage
         run: "df -h"
       - name: Print Docker details
