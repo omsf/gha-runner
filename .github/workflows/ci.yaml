@@ -58,7 +58,7 @@ jobs:
           pytest -v --cov=gha_runner --cov-report=xml --color=yes .
 
       - name: CodeCov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           file: ./coverage.xml
           flags: unittests
