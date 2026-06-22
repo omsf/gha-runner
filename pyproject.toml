@@ -6,7 +6,7 @@ authors = [
     { name = "David W.H. Swenson", email = "david.swenson@omsf.io" },
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.12"
 dependencies = ["requests"]
 license.file = "LICENSE"
 dynamic = ["version"]
