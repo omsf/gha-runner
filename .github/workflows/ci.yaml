@@ -44,12 +44,11 @@ jobs:
           enable-cache: true
 
       - name: Install Project
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --locked --all-extras
 
       - name: Run tests
         run: |
-          cd tests/
-          pytest -v --cov=gha_runner --cov-report=xml --color=yes .
+          uv run pytest -v --cov=gha_runner --cov-report=xml --color=yes tests
 
       - name: CodeCov
         uses: codecov/codecov-action@v7
