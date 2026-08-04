@@ -90,6 +90,10 @@ name: Test Self-Hosted Runner
 on:
   workflow_dispatch:
 
+env:
+  AWS_ROLE_ARN: <your-IAM-Role-ARN>
+  AWS_REGION: <your-region-here, for example us-east-1>
+
 jobs:
   start-aws-runner:
     runs-on: ubuntu-latest
@@ -103,8 +107,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
         with:
-          role-to-assume: <your-IAM-Role-ARN>
-          aws-region: <your-region-here, for example us-east-1>
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
       - name: Create cloud runner
         id: aws-start
         uses: omsf/start-aws-gha-runner@a68aee57f031da4b6a0063d901e02f0b17d95f94 # v1.3.0
@@ -138,8 +142,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
         with:
-          role-to-assume: <your-IAM-Role-ARN>
-          aws-region: <your-region-here, for example us-east-1>
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
       - name: Stop instances
         uses: omsf/stop-aws-gha-runner@a3d2e34cba8571eaf9b40ae00705d6b2b77402f6 # v1.0.0
         with:
