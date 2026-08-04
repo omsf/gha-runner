@@ -101,15 +101,16 @@ jobs:
       instances: ${{ steps.aws-start.outputs.instances }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
         with:
           role-to-assume: <your-IAM-Role-ARN>
           aws-region: <your-region-here, for example us-east-1>
       - name: Create cloud runner
         id: aws-start
-        uses: omsf/start-aws-gha-runner@v1.3.0
+        uses: omsf/start-aws-gha-runner@a68aee57f031da4b6a0063d901e02f0b17d95f94 # v1.3.0
         with:
-          aws_image_id: <your-ami-here, for example ami-0d5079d9be06933e5>
+          aws_image_name: <The name of your AMI you want to use>
+          aws_image_id: latest
           aws_instance_type: <your instance type here, for example g4dn.xlarge>
           aws_home_dir: /home/ubuntu
         env:
@@ -119,7 +120,7 @@ jobs:
     needs:
       - start-aws-runner
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Print disk usage
         run: "df -h"
       - name: Print Docker details
@@ -135,12 +136,12 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
         with:
           role-to-assume: <your-IAM-Role-ARN>
           aws-region: <your-region-here, for example us-east-1>
       - name: Stop instances
-        uses: omsf/stop-aws-gha-runner@v1.0.0
+        uses: omsf/stop-aws-gha-runner@a3d2e34cba8571eaf9b40ae00705d6b2b77402f6 # v1.0.0
         with:
           instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
         env:
