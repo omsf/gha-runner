@@ -105,13 +105,13 @@ jobs:
       instances: ${{ steps.aws-start.outputs.instances }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
       - name: Create cloud runner
         id: aws-start
-        uses: omsf/start-aws-gha-runner@a68aee57f031da4b6a0063d901e02f0b17d95f94 # v1.3.0
+        uses: omsf/start-aws-gha-runner@8523c3b2474a899636f06e6cab4829c853e107dc # v1.4.0
         with:
           aws_image_name: <The name of your AMI you want to use>
           aws_image_id: latest
@@ -140,7 +140,7 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
