@@ -2,4 +2,4 @@
 # pinact - https://github.com/suzuki-shunsuke/pinact
 version: 3
 files:
-  - pattern: docs/aws.md
+  - pattern: docs/*.md
