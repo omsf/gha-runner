@@ -31,7 +31,8 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
         "ec2:TerminateInstances",
         "ec2:DescribeInstances",
         "ec2:DescribeInstanceStatus",
-        "ec2:DescribeImages"
+        "ec2:DescribeImages",
+        "ec2:DescribeAvailabilityZones"
       ],
       "Resource": "*"
     }
