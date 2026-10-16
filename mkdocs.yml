@@ -4,6 +4,7 @@ nav:
   - Home: index.md
   - Implementations:
       - AWS: aws.md
+      - NVIDIA Brev: brev.md
   - API Reference:
       - Modules:
           - Cloud Deployment: api/clouddeployment.md
@@ -23,6 +24,7 @@ plugins:
           - index.md
         Implementations:
           - aws.md
+          - brev.md
         API Reference:
           - api/*.md
 
