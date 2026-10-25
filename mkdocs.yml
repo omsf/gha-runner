@@ -5,6 +5,7 @@ nav:
   - Implementations:
       - AWS: aws.md
       - Matrix: matrix.md
+      - NVIDIA Brev: brev.md
   - API Reference:
       - Modules:
           - Cloud Deployment: api/clouddeployment.md
@@ -25,6 +26,7 @@ plugins:
         Implementations:
           - aws.md
           - matrix.md
+          - brev.md
         API Reference:
           - api/*.md
 

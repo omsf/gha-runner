@@ -8,7 +8,7 @@ Before starting, complete the [AWS setup](aws.md) to configure the OIDC provider
 
 ## Overview
 
-When using ephemeral runners with a matrix, each matrix job must have its own lifecycle. If you start all runners in one job and stop them in another, the matrix job outputs (such as the instance mappings) can be overwritten by each matrix entry. Keeping the start, test, and stop jobs together within the reusable workflow avoids this problem.
+When using ephemeral runners with a matrix, each matrix job must have its own lifecycle. If runner startup is itself a matrix job, its outputs (such as instance mappings) can be overwritten by another matrix entry. Keeping the start, test, and stop jobs together within the reusable workflow avoids this problem.
 
 Save the caller workflow as `.github/workflows/matrix-test.yaml` and the reusable workflow as `.github/workflows/reusable-matrix-test.yaml` so the relative `uses: ./.github/workflows/reusable-matrix-test.yaml` path resolves correctly.
 
