@@ -7,6 +7,7 @@ Documentation for GHA Runner may be found at: [https://gha-runner.readthedocs.io
 
 ## Implementations
 - [start-aws-gha-runner](https://github.com/omsf/start-aws-gha-runner) and [stop-aws-gha-runner](https://github.com/omsf/stop-aws-gha-runner) (to see this in action take a look at the example used on [AWS](https://gha-runner.readthedocs.io/en/latest/aws/))
+- [start-brev-gha-runner](https://github.com/omsf-eco-infra/start-brev-gha-runner) and [stop-brev-gha-runner](https://github.com/omsf-eco-infra/stop-brev-gha-runner) (see the setup guide and example for [NVIDIA Brev](https://gha-runner.readthedocs.io/en/latest/brev/))
 
 ## Acknowledgements
 This action was heavily inspired by the [ec2-github-runner](https://github.com/machulav/ec2-github-runner). This library takes much of its inspiration around architecture from the `ec2-github-runner` itself. Thank you to the authors of that action for providing a solid foundation to build upon.

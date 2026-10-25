@@ -11,6 +11,7 @@ The `gha_runner` is a flexible, cloud-native solution for dynamically provisioni
 
 ## Implementations
 - **AWS** - [start-aws-gha-runner](https://github.com/omsf/start-aws-gha-runner) and [stop-aws-gha-runner](https://github.com/omsf/stop-aws-gha-runner). For more information, see [our AWS docs](aws.md)
+- **NVIDIA Brev** - [start-brev-gha-runner](https://github.com/omsf-eco-infra/start-brev-gha-runner) and [stop-brev-gha-runner](https://github.com/omsf-eco-infra/stop-brev-gha-runner). For more information, see [our Brev docs](brev.md).
 
 ## Using this library
 You can install this library from [PyPI](https://pypi.org/project/gha-runner/).
