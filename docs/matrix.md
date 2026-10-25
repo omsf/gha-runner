@@ -2,9 +2,15 @@
 
 This document explains how to use a matrix strategy with reusable workflows to run isolated test environments on AWS. Each reusable workflow manages its own `start -> test -> always-cleanup` lifecycle. This ensures that instance mappings are not lost through matrix job outputs and that each matrix job runs on its own isolated runner labels.
 
+## Prerequisites
+
+Before starting, complete the [AWS setup](aws.md) to configure the OIDC provider and IAM role. You also need the `AWS_ROLE` and `GH_PAT` secrets configured in your repository. Replace `<The name of your AMI you want to use>` with the name of your AMI.
+
 ## Overview
 
-The matrix strategy allows you to run the same test across multiple configurations. When using ephemeral runners, it is important that each matrix job has its own lifecycle. A monolithic workflow with a single start and stop job is not suitable for a matrix because the instance mappings would be shared or lost.
+When using ephemeral runners with a matrix, each matrix job must have its own lifecycle. If you start all runners in one job and stop them in another, the matrix job outputs (such as the instance mappings) can be overwritten by each matrix entry. Keeping the start, test, and stop jobs together within the reusable workflow avoids this problem.
+
+Save the caller workflow as `.github/workflows/matrix-test.yaml` and the reusable workflow as `.github/workflows/reusable-matrix-test.yaml` so the relative `uses: ./.github/workflows/reusable-matrix-test.yaml` path resolves correctly.
 
 The recommended pattern is:
 
@@ -28,8 +34,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Use GPU instances for GPU tests to avoid advertising GPU-only tests on CPU instances.
-        instance_type: ["g4dn.xlarge"]
+        # Add the GPU-capable instance types you want to test.
+        instance_type: ["g4dn.xlarge", "g4dn.2xlarge"]
     uses: ./.github/workflows/reusable-matrix-test.yaml
     permissions:
       id-token: write
@@ -86,9 +92,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run test
         run: |
-          # Add your test commands here. For GPU instances, you can use nvidia-smi.
-          # Avoid running GPU-only tests on CPU instances.
-          echo "Running test on ${{ inputs.instance_type }}"
+          # Replace this with your project's test commands.
+          nvidia-smi
   stop-aws-runner:
     runs-on: ubuntu-latest
     permissions:
@@ -121,4 +126,4 @@ jobs:
 - **Secrets**: The caller uses `secrets: inherit` to pass the required secrets to the reusable workflow. The reusable workflow accesses `secrets.AWS_ROLE` and `secrets.GH_PAT`.
 - **OIDC permissions**: Both the start and stop jobs have `id-token: write` permissions to allow the AWS actions to assume the role via OIDC.
 - **Pinned SHAs**: All third-party actions are pinned to specific commit SHAs for security and reproducibility.
-- **GPU-only tests**: If you need to run GPU-only tests, restrict the matrix to GPU instance types. Avoid advertising or running GPU-only tests on CPU instances.
+- **GPU-only tests**: Use GPU-capable instance types for GPU-only tests. Running GPU tests on CPU instances will fail.
