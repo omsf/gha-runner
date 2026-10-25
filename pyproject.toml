@@ -11,6 +11,12 @@ dependencies = ["requests"]
 license.file = "LICENSE"
 dynamic = ["version"]
 
+[project.urls]
+Homepage = "https://github.com/omsf/gha-runner"
+Documentation = "https://gha-runner.readthedocs.io/en/latest/"
+Source = "https://github.com/omsf/gha-runner"
+Issues = "https://github.com/omsf/gha-runner/issues"
+
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "responses"]
 docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-llmstxt"]
