@@ -1,4 +1,3 @@
-from copy import deepcopy
 from abc import ABC, abstractmethod
 from gha_runner.gh import GitHubInstance, MissingRunnerLabel
 from gha_runner.helper.workflow_cmds import warning, error
@@ -17,12 +16,14 @@ class CreateCloudInstance(ABC):
     def create_instances(self) -> dict[str, str]:
         """Create instances in the cloud provider and return their IDs.
 
-        The number of instances to create is defined by the implementation.
+        The number of instances to create is defined by the
+        implementation.
 
         Returns
         -------
         dict[str, str]
-            A dictionary of instance IDs and their corresponding github runner labels.
+            A dictionary of instance IDs and their corresponding github
+            runner labels.
 
         """
         raise NotImplementedError
@@ -48,7 +49,8 @@ class CreateCloudInstance(ABC):
         Parameters
         ----------
         mapping : dict[str, str]
-            A dictionary of instance IDs and their corresponding github runner labels.
+            A dictionary of instance IDs and their corresponding github
+            runner labels.
 
         """
         raise NotImplementedError
@@ -94,7 +96,8 @@ class StopCloudInstance(ABC):
         Returns
         -------
         dict[str, str]
-            A dictionary of instance IDs and their corresponding github runner labels.
+            A dictionary of instance IDs and their corresponding github
+            runner labels.
 
         """
         raise NotImplementedError
@@ -157,7 +160,8 @@ class DeployInstance:
     def start_runner_instances(self):
         """Start the runner instances.
 
-        This function starts the runner instances and waits for them to be ready.
+        This function starts the runner instances and waits for them to be
+        ready.
 
         """
         print("Starting up...")
@@ -219,7 +223,8 @@ class TeardownInstance:
     def stop_runner_instances(self):
         """Stop the runner instances.
 
-        This function stops the runner instances and waits for them to be removed.
+        This function stops the runner instances and waits for them to be
+        removed.
 
         """
         print("Shutting down...")
@@ -237,14 +242,16 @@ class TeardownInstance:
             try:
                 print(f"Removing runner {label}")
                 self.gh.remove_runner(label)
-            # This occurs when we have a runner that might already be shutdown.
-            # Since we are mainly using the ephemeral runners, we expect this to happen
+            # This occurs when we have a runner that might already be
+            # shutdown. Since we are mainly using the ephemeral runners,
+            # we expect this to happen
             except MissingRunnerLabel:
                 print(f"Runner {label} does not exist, skipping...")
                 continue
-            # This is more of the case when we have a failure to remove the runner
-            # This is not a concern for the user (because we will remove the instance anyways),
-            # but we should log it for debugging purposes.
+            # This is more of the case when we have a failure to remove the
+            # runner. This is not a concern for the user (because we will
+            # remove the instance anyways), but we should log it for
+            # debugging purposes.
             except Exception as e:
                 warning(title="Failed to remove runner", message=e)
         print("Removing instances...")

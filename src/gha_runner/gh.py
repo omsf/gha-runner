@@ -12,10 +12,12 @@ import requests
 
 
 class TokenRetrievalError(Exception):
-    """Exception raised when there is an error retrieving a token from GitHub."""
+    """Exception raised when there is an error retrieving a token
+    from GitHub."""
 
 
-class MissingRunnerLabel(Exception):
+# Public exception name kept as-is for backwards compatibility with callers.
+class MissingRunnerLabel(Exception):  # noqa: N818 - existing public name
     """Exception raised when a runner does not exist in the repository."""
 
 
@@ -59,7 +61,8 @@ class GitHubInstance:
         self.repo = repo
 
     def _headers(self, header_kwargs):
-        """Generate headers for API requests, adding authorization and specific API version.
+        """Generate headers for API requests, adding authorization and
+        specific API version.
 
         Can be removed if this is added into PyGitHub.
 
@@ -71,7 +74,8 @@ class GitHubInstance:
         Returns
         -------
         dict
-            Headers including authorization, API version, and any additional headers.
+            Headers including authorization, API version, and any additional
+            headers.
 
         """
         headers = {
@@ -213,15 +217,21 @@ class GitHubInstance:
         # paginate through the pages until we have all the runners
         while (len(runners) < total_runners):
             try:
-                res = self.get(f"repos/{self.repo}/actions/runners?per_page={per_page}&page={page}")
+                res = self.get(
+                    f"repos/{self.repo}/actions/runners"
+                    f"?per_page={per_page}&page={page}"
+                )
                 # This allows for arbitrary mappable objects to be used
                 if not isinstance(res, collections.abc.Mapping):
                     # This could be related to the API or the request itself.
                     # ie the response is not a JSON object
-                    raise RunnerListError(f"Did not receive mapping object: {res}")
+                    raise RunnerListError(
+                        f"Did not receive mapping object: {res}"
+                    )
                 total_runners = res["total_count"]
                 page += 1
-                # protect from bug/issue where total_count is higher than actual # of runners
+                # protect from bug/issue where total_count is higher than
+                # actual # of runners
                 if len(res["runners"]) < 1:
                     break
                 for runner in res["runners"]:
@@ -379,7 +389,8 @@ class GitHubInstance:
             )
         if architecture not in supported_platforms[platform]:
             raise ValueError(
-                f"Architecture '{architecture}' not supported for platform '{platform}'. "
+                f"Architecture '{architecture}' not supported for "
+                f"platform '{platform}'. "
                 f"Supported architectures are {supported_platforms[platform]}"
             )
         release = self._get_latest_release(repo)
@@ -388,5 +399,6 @@ class GitHubInstance:
             if platform in asset["name"] and architecture in asset["name"]:
                 return asset["browser_download_url"]
         raise RuntimeError(
-            f"Runner release not found for platform {platform} and architecture {architecture}"
+            f"Runner release not found for platform {platform} "
+            f"and architecture {architecture}"
         )

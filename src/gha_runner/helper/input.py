@@ -35,10 +35,12 @@ class ParamConfig(NamedTuple):
 
 
 class EnvVarBuilder:
-    """A builder class for constructing a dictionary of parameters from environment variables.
+    """A builder class for constructing a dictionary of parameters
+    from environment variables.
 
-    This class provides a fluent interface for parsing and transforming environment variables
-    into a structured dictionary, with support for JSON parsing and type conversion.
+    This class provides a fluent interface for parsing and transforming
+    environment variables into a structured dictionary, with support for
+    JSON parsing and type conversion.
 
     Attributes
     ----------
