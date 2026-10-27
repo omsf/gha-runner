@@ -4,6 +4,7 @@ nav:
   - Home: index.md
   - Implementations:
       - AWS: aws.md
+      - Matrix: matrix.md
       - NVIDIA Brev: brev.md
   - API Reference:
       - Modules:
@@ -24,6 +25,7 @@ plugins:
           - index.md
         Implementations:
           - aws.md
+          - matrix.md
           - brev.md
         API Reference:
           - api/*.md
