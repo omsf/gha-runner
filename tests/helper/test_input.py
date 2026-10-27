@@ -20,7 +20,9 @@ def test_parse_params_empty():
     builder = (
         EnvVarBuilder(env)
         .update_state("INPUT_AWS_IMAGE_ID", "image_id", allow_empty=True)
-        .update_state("INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True)
+        .update_state(
+            "INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True
+        )
         .update_state("INPUT_AWS_SUBNET_ID", "subnet_id")
         .update_state("INPUT_AWS_SECURITY_GROUP_ID", "security_group_id")
         .update_state("INPUT_AWS_IAM_ROLE", "iam_role")
@@ -74,7 +76,8 @@ def test_check_required():
     with pytest.raises(
         Exception,
         match=re.escape(
-            "Missing required environment variables: ['AWS_ACCESS_KEY', 'AWS_SECRET_KEY']"
+            "Missing required environment variables: "
+            "['AWS_ACCESS_KEY', 'AWS_SECRET_KEY']"
         ),
     ):
         check_required(env, required)
@@ -82,7 +85,8 @@ def test_check_required():
     with pytest.raises(
         Exception,
         match=re.escape(
-            "Missing required environment variables: ['GH_TOKEN', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY']"
+            "Missing required environment variables: "
+            "['GH_TOKEN', 'AWS_ACCESS_KEY', 'AWS_SECRET_KEY']"
         ),
     ):
         check_required(env, required)

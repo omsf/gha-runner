@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from gha_runner.clouddeployment import (
     CreateCloudInstance,
     DeployInstance,
@@ -162,7 +162,8 @@ def test_teardown_instance_failed_wait(gh_mock, capsys):
         "Removing instances...",
         "Waiting for instance to be removed...",
         "Failed to remove instances check your provider console: Bad wait",
-        "::error title=Failed to remove instances, check your provider console::Bad wait",
+        "::error title=Failed to remove instances, "
+        "check your provider console::Bad wait",
     ]
     actual_output = catpured_output.strip().split("\n")
     assert actual_output == expected_output

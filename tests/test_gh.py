@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import responses
 from gha_runner.gh import (
     GitHubInstance,
@@ -419,6 +419,9 @@ def test_get_latest_reunner_release_error(github_instance):
     )
     with pytest.raises(
         RuntimeError,
-        match=f"Runner release not found for platform {platform} and architecture {arch}",
+        match=(
+            f"Runner release not found for platform {platform} "
+            f"and architecture {arch}"
+        ),
     ):
         github_instance.get_latest_runner_release("linux", "x64")
