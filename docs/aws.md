@@ -50,10 +50,79 @@ The goal of this document is to provide a guide on how to set up the GitHub Acti
       - GitHub organization - This would be your org or username for example, `omsf-eco-infra`. This limits it so that credentials are only given to this organization.
       - GitHub repository - This would limit the scope of this authentication to a given repo. You may choose to set or extend this in the future.
       - GitHub branch - This further restricts usage to a single branch.
+      - The console fields accept organization/repository/branch names only. If your repository uses the immutable subject format, edit the trust policy JSON directly instead; see [OIDC subject claims](#oidc-subject-claims) below.
   8. Click "Next".
   9. Now find and select the policy created earlier (if you used above, this would be `gha-runner-policy`) and then click "Next".
   10. Add a role name and optionally description, then click "Create Role".
   11. Select your newly named role and copy the ARN, we will use this later.
+### OIDC subject claims
+AWS validates the `sub` claim of the OIDC token against your role's trust policy. GitHub uses two formats:
+
+- Legacy (mutable), used by repositories created before July 15, 2026: `repo:ORG/REPO:ref:refs/heads/BRANCH`
+- Immutable, which appends the numeric owner and repository IDs: `repo:ORG@OWNER_ID/REPO@REPOSITORY_ID:ref:refs/heads/BRANCH`
+
+Per GitHub's [April 23, 2026 changelog](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-github-actions-oidc-tokens/) and the [OIDC reference](https://docs.github.com/en/actions/reference/security/oidc):
+
+- Repositories created after July 15, 2026 automatically use the immutable format.
+- Repository renames and transfers after July 15, 2026 also adopt the immutable format.
+- Existing repositories keep the legacy format unless you opt in, at the organization or repository level, via the OIDC settings UI or REST API.
+- This applies to github.com only; GitHub Enterprise Server is unaffected.
+
+Existing roles are therefore unchanged unless the trusted repository is new, renamed, transferred, or has opted in. Only then do you need the immutable format in the trust policy.
+
+Get the IDs with the GitHub CLI, using the repository's current name:
+```console
+$ gh api repos/OWNER/REPO --jq '{created_at, repository_id: .id, owner_id: .owner.id}'
+{
+  "created_at": "2026-10-08T16:01:21Z",
+  "repository_id": 456789012,
+  "owner_id": 123456789
+}
+```
+To see the exact `sub` prefix GitHub will issue for a repository:
+```console
+$ gh api repos/OWNER/REPO/actions/oidc/customization/sub --jq '.sub_claim_prefix'
+```
+The following trust policy scopes the role to one repository and branch, keeping the `aud` condition required by `aws-actions/configure-aws-credentials`:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+          "token.actions.githubusercontent.com:sub": "repo:my-org@123456789/my-repo@456789012:ref:refs/heads/main"
+        }
+      }
+    }
+  ]
+}
+```
+For a repository still on the legacy format, use the same policy with this condition:
+```json
+{
+  "StringEquals": {
+    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+    "token.actions.githubusercontent.com:sub": "repo:my-org/my-repo:ref:refs/heads/main"
+  }
+}
+```
+If the job references a GitHub environment, scope the subject to it instead (and add environment protection rules to restrict which branches may use it):
+```json
+{
+  "StringEquals": {
+    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+    "token.actions.githubusercontent.com:sub": "repo:my-org@123456789/my-repo@456789012:environment:production"
+  }
+}
+```
+Prefer `StringEquals` with a specific branch or environment. Only use `StringLike` with `repo:ORG@OWNER_ID/REPO@REPOSITORY_ID:*` (or `repo:ORG/REPO:*`) when every branch, tag, and pull request in the repository should be able to assume the role. AWS rejects a `sub` condition whose value is only a wildcard.
 ### Create your GitHub Access Token
   1. This can be done with either a Personal Access Token or a Fine-Grained Personal Access Token.
   2. Go to your GitHub account settings.
@@ -178,4 +247,6 @@ jobs:
 - [AWS - Request Increase](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html#request-increase)
 - [AWS - Get Started with Deep Learning Using the AWS Deep Learning AMI](https://aws.amazon.com/blogs/machine-learning/get-started-with-deep-learning-using-the-aws-deep-learning-ami/)
 - [GitHub - Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+- [GitHub - OpenID Connect reference (subject claims)](https://docs.github.com/en/actions/reference/security/oidc)
+- [GitHub - Immutable subject claims for GitHub Actions OIDC tokens](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-github-actions-oidc-tokens/)
 - [AltF4 - Using IAM the secure way in GitHub Actions](https://altf4.blog/blog/2024-03-03-using-iam-the-secure-way-in-github-actions/)
