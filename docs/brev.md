@@ -144,7 +144,7 @@ jobs:
     if: ${{ always() && needs.start-brev-runner.outputs.mapping != '' }}
     steps:
       - name: Delete Brev runner
-        uses: omsf-eco-infra/stop-brev-gha-runner@4b88a4d25877aafb37ca29f5f49996ab0af76ab6 # v1
+        uses: omsf-eco-infra/stop-brev-gha-runner@54a8a10bd8d455457e71d14e92e78c6b216f07e7 # v1.1.0
         with:
           instance_mapping: ${{ needs.start-brev-runner.outputs.mapping }}
         env:
