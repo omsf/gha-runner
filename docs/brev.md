@@ -122,7 +122,7 @@ jobs:
     steps:
       - name: Create Brev runner
         id: brev-start
-        uses: omsf-eco-infra/start-brev-gha-runner@8caae6a56ffe6f455278dea33e20b9b8dc003d4e # v1
+        uses: omsf-eco-infra/start-brev-gha-runner@281d77842f8f4d29900d0c954f1d8a1ae59fd334 # v1.0.1
         with:
           brev_instance_type: g5.xlarge,g6.xlarge
           instance_count: 1
@@ -144,7 +144,7 @@ jobs:
     if: ${{ always() && needs.start-brev-runner.outputs.mapping != '' }}
     steps:
       - name: Delete Brev runner
-        uses: omsf-eco-infra/stop-brev-gha-runner@54a8a10bd8d455457e71d14e92e78c6b216f07e7 # v1.1.0
+        uses: omsf-eco-infra/stop-brev-gha-runner@8a106670bde9bb88c4b983bf8233a2a15feb3d15 # v1.1.1
         with:
           instance_mapping: ${{ needs.start-brev-runner.outputs.mapping }}
         env:
